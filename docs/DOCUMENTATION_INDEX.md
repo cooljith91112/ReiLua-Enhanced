@@ -53,8 +53,8 @@ Asset loading system documentation:
 
 ### 🔧 [BUILD_SCRIPTS.md](BUILD_SCRIPTS.md)
 Build automation documentation:
-- `build_dev.bat` / `build_dev.sh` - Development builds
-- `build_release.bat` / `build_release.sh` - Release builds
+- `scripts\build_dev.bat` / `scripts/build_dev.sh` - Development builds
+- `scripts\build_release.bat` / `scripts/build_release.sh` - Release builds
 - Features of each build type
 - Workflow examples
 - Customizing executable name, icon, and properties
@@ -93,7 +93,7 @@ Complete API reference:
 - Function signatures
 - Raygui, Raymath, Lights, Easings, RLGL modules
 
-### 📝 [ReiLua_API.lua](ReiLua_API.lua)
+### 📝 [tools/ReiLua_API.lua](tools/ReiLua_API.lua)
 Lua annotations file:
 - Provides autocomplete in LSP-enabled editors
 - Function documentation
@@ -118,7 +118,7 @@ Technical implementation details:
 
 ### "I want to embed my game into a single .exe"
 1. Read [EMBEDDING.md](EMBEDDING.md)
-2. Use `build_release.bat` / `build_release.sh`
+2. Use `scripts\build_release.bat` / `scripts/build_release.sh`
 3. Follow the complete release workflow in [README.md](README.md)
 
 ### "I want to add a loading screen"
@@ -143,21 +143,21 @@ Technical implementation details:
 ### "I want to setup my code editor"
 1. Read [ZED_EDITOR_SETUP.md](ZED_EDITOR_SETUP.md)
 2. Install Zed and Lua Language Server
-3. Copy `ReiLua_API.lua` to your project
+3. Copy `tools/ReiLua_API.lua` to your project
 4. Create `.zed/settings.json` configuration
 5. Set up tasks for quick testing
 
 ### "I want to build ReiLua from source"
 1. Read [README.md](README.md) - Building from Source section
 2. Install prerequisites (CMake, compiler, Raylib, Lua)
-3. Use `build_dev.bat` for development
-4. Use `build_release.bat` for release
+3. Use `scripts\build_dev.bat` for development
+4. Use `scripts\build_release.bat` for release
 
 ### "I need API reference"
 1. Open [API.md](API.md)
 2. Search for function name
 3. See function signature and description
-4. Or copy [ReiLua_API.lua](ReiLua_API.lua) for autocomplete
+4. Or copy [tools/ReiLua_API.lua](tools/ReiLua_API.lua) for autocomplete
 
 ---
 
