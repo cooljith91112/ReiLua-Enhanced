@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+45d53df526cb85dd1b7dfcb0bb4a2289 embedded_font.h
+59f2959bfafabf365c2b7e880ceb04cd embedded_logo.h

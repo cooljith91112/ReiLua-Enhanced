@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\ReiLua.dir/objects.a
+C:\Users\indrajith_inapp\Documents\tools\w64devkit\bin\ar.exe qc CMakeFiles\ReiLua.dir/objects.a @CMakeFiles\ReiLua.dir\objects1.rsp
+C:\Users\indrajith_inapp\Documents\tools\w64devkit\bin\cc.exe  -DEMBED_LOGO -DEMBED_FONT -DPLATFORM_DESKTOP;-mwindows -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\ReiLua.dir/objects.a -Wl,--no-whole-archive -o ReiLua.exe -Wl,--out-implib,libReiLua.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\ReiLua.dir\linkLibs.rsp

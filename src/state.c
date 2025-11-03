@@ -4,31 +4,71 @@
 #include "textures.h"
 #include "models.h"
 
+#ifdef EMBED_FONT
+	#include "embedded_font.h"
+#endif
+
 State* state;
 
 bool stateInit( int argn, const char** argc, const char* basePath ) {
 	state = malloc( sizeof( State ) );
+
 	state->basePath = malloc( STRING_LEN * sizeof( char ) );
 	strncpy( state->basePath, basePath, STRING_LEN - 1 );
+
+	/* Ensure basePath ends with a slash */
+	size_t len = strlen( state->basePath );
+	if ( len > 0 && state->basePath[len - 1] != '/' && state->basePath[len - 1] != '\\' ) {
+		if ( len < STRING_LEN - 2 ) {
+			state->basePath[len] = '/';
+			state->basePath[len + 1] = '\0';
+		}
+	}
+
+	state->hasWindow = true;
+	state->run = true;
+	state->resolution = (Vector2){ 800, 600 };
 	state->luaState = NULL;
-	state->run = luaInit( argn, argc );;
 	state->logLevelInvalid = LOG_ERROR;
 	state->gcUnload = true;
 	state->lineSpacing = 15;
 	state->mouseOffset = (Vector2){ 0, 0 };
 	state->mouseScale = (Vector2){ 1, 1 };
+	state->customFontLoaded = false;
 
-#if defined PLATFORM_DESKTOP_SDL2 || defined PLATFORM_DESKTOP_SDL3
-	state->SDL_eventQueue = malloc( PLATFORM_SDL_EVENT_QUEUE_LEN * sizeof( SDL_Event ) );
-	state->SDL_eventQueueLen = 0;
+	InitWindow( state->resolution.x, state->resolution.y, "ReiLua" );
+
+	if ( !IsWindowReady() ) {
+		state->hasWindow = false;
+		state->run = false;
+	}
+	if ( state->run ) {
+		state->run = luaInit( argn, argc );
+	}
+
+	/* Load custom default font */
+#ifdef EMBED_FONT
+	/* Load from embedded data */
+	state->defaultFont = LoadFontFromMemory( ".ttf", embedded_font_data, embedded_font_data_size, 48, NULL, 0 );
+	SetTextureFilter( state->defaultFont.texture, TEXTURE_FILTER_POINT );
+	state->customFontLoaded = true;
+#else
+	/* Load from file (development mode) */
+	char fontPath[STRING_LEN];
+	snprintf( fontPath, STRING_LEN, "%sfonts/Oleaguid.ttf", state->basePath );
+
+	if ( FileExists( fontPath ) ) {
+		state->defaultFont = LoadFontEx( fontPath, 48, NULL, 0 );
+		SetTextureFilter( state->defaultFont.texture, TEXTURE_FILTER_POINT );
+		state->customFontLoaded = true;
+	}
+	else {
+		TraceLog( LOG_WARNING, "Custom font not found at '%s', using default font", fontPath );
+		state->defaultFont = GetFontDefault();
+		state->customFontLoaded = false;
+	}
 #endif
 
-	return state->run;
-}
-
-/* Init after InitWindow. (When there is OpenGL context.) */
-void stateContextInit() {
-	state->defaultFont = GetFontDefault();
 	state->guiFont = GuiGetFont();
 	state->defaultMaterial = LoadMaterialDefault();
 	state->defaultTexture = (Texture){ 1, 1, 1, 1, 7 };
@@ -39,6 +79,17 @@ void stateContextInit() {
 	for ( int i = 0; i < RL_MAX_SHADER_LOCATIONS; i++ ) {
 		state->RLGLcurrentShaderLocs[i] = defaultShaderLocs[i];
 	}
+#if defined PLATFORM_DESKTOP_SDL2 || defined PLATFORM_DESKTOP_SDL3
+	state->SDL_eventQueue = malloc( PLATFORM_SDL_EVENT_QUEUE_LEN * sizeof( SDL_Event ) );
+	state->SDL_eventQueueLen = 0;
+#endif
+
+	return state->run;
+}
+
+/* Init after InitWindow. (When there is OpenGL context.) */
+void stateContextInit() {
+	/* This function is no longer needed as initialization is done in stateInit */
 }
 
 void stateInitInterpret( int argn, const char** argc ) {
@@ -54,7 +105,11 @@ void stateFree() {
 		lua_close( state->luaState );
 		state->luaState = NULL;
 	}
-	if ( IsWindowReady() ) {
+	/* Unload custom font if it was loaded - must be done before CloseWindow */
+	if ( state->hasWindow && state->customFontLoaded ) {
+		UnloadFont( state->defaultFont );
+	}
+	if ( state->hasWindow ) {
 		CloseWindow();
 	}
 #ifdef PLATFORM_DESKTOP_SDL

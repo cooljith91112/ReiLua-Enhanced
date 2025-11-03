@@ -1684,27 +1684,6 @@ bool luaCallMain() {
 	SetTraceLogCallback( logCustom );
 
 	lua_getglobal( L, "RL" );
-	lua_getfield( L, -1, "config" );
-
-	if ( lua_isfunction( L, -1 ) ) {
-		if ( lua_pcall( L, 0, 0, tracebackidx ) != 0 ) {
-			TraceLog( LOG_ERROR, "Lua error: %s", lua_tostring( L, -1 ) );
-			return false;
-		}
-	}
-	lua_pop( L, -1 );
-	/* If InitWindow is not called in RL.config, call it here. */
-	if ( !IsWindowReady() ) {
-		InitWindow( 800, 600, "ReiLua" );
-	}
-	if ( IsWindowReady() ) {
-		stateContextInit();
-	}
-	else {
-		return false;
-	}
-
-	lua_getglobal( L, "RL" );
 	lua_getfield( L, -1, "init" );
 
 	if ( lua_isfunction( L, -1 ) ) {
