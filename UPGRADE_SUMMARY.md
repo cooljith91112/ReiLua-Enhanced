@@ -69,6 +69,15 @@ Successfully ported embedded assets, splash screens, and asset loading features 
   - `EMBEDDING.md` - Complete guide to embedding Lua and assets
   - `ASSET_LOADING.md` - Asset loading API documentation
   - `SPLASH_SCREENS.md` - Splash screen customization guide
+  - `BUILD_SCRIPTS.md` - Build scripts documentation
+
+- **Build Scripts:**
+  - `build_dev.bat` / `build_dev.sh` - One-command development builds
+  - `build_release.bat` / `build_release.sh` - One-command release builds with embedding
+
+- **Icon and Resources:**
+  - `icon.ico` - Default Windows executable icon
+  - `resources.rc` - Windows resource file for exe metadata
 
 ### Modified Files
 - `CMakeLists.txt` - Added embedding options and build commands
@@ -80,7 +89,38 @@ Successfully ported embedded assets, splash screens, and asset loading features 
 
 ## Build Options
 
-### Development Build (Fast Iteration)
+### Quick Build (Recommended)
+
+**Development (Fast Iteration):**
+```bash
+# Windows
+build_dev.bat
+
+# Linux/Unix  
+./build_dev.sh
+```
+
+**Release (Single Executable):**
+```bash
+# Copy files to build directory first
+cd build
+copy ..\*.lua .
+mkdir assets
+copy ..\assets\* assets\
+
+# Then build
+cd ..
+
+# Windows
+build_release.bat
+
+# Linux/Unix
+./build_release.sh
+```
+
+### Manual Build
+
+**Development Build (Fast Iteration):**
 ```bash
 cmake -G "MinGW Makefiles" ..
 mingw32-make
@@ -89,7 +129,7 @@ mingw32-make
 - Fast edit-and-run workflow
 - Use `--no-logo` to skip splash screens
 
-### Release Build (Single Executable)
+**Release Build (Single Executable):**
 ```bash
 # Copy Lua files and assets to build directory
 copy ..\*.lua .
