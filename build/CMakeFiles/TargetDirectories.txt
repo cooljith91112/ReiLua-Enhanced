@@ -1,3 +1,0 @@
-C:/Users/indrajith_inapp/Documents/projects/ReiLua/build/CMakeFiles/ReiLua.dir
-C:/Users/indrajith_inapp/Documents/projects/ReiLua/build/CMakeFiles/edit_cache.dir
-C:/Users/indrajith_inapp/Documents/projects/ReiLua/build/CMakeFiles/rebuild_cache.dir
