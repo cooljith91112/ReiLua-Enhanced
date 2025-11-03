@@ -130,7 +130,7 @@ To make ReiLua API available for all projects:
 ## Method 3: Using Zed's LSP Configuration
 
 Create a `.zed/settings.json` in your project:
-
+> Note  There is a sample zed settings json file in the repo root (zed.sample.settings.json)
 ```json
 {
   "lsp": {
