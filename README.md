@@ -31,8 +31,8 @@ This enhanced version is built upon:
   - Created by Ramon Santamaria ([@raysan5](https://github.com/raysan5))
   - Licensed under the zlib/libpng license
 - **[ReiLua](https://github.com/Gamerfiend/ReiLua)** - The original Lua bindings for Raylib
-  - Created by Gamerfiend
-  - Licensed under the zlib/libpng license
+  - Created by Jussi Viitala
+  - Licensed under the MIT license
 - **[Lua](https://www.lua.org/)** (v5.4) - Powerful, efficient, lightweight, embeddable scripting language
 
 ### Enhancements Added
@@ -128,7 +128,7 @@ function RL.update( delta )
 	if RL.IsKeyPressed( RL.KEY_ENTER ) then
 		local winSize = RL.GetScreenSize()
 		local measuredSize = RL.MeasureTextEx( RL.GetFontDefault(), text, textSize, 2 )
-		
+
 		textColor = RL.BLUE
 		textPos = { winSize[1] / 2 - measuredSize[1] / 2, winSize[2] / 2 - measuredSize[2] / 2 }
 	end
@@ -200,14 +200,14 @@ function RL.init()
         "assets/background.png",
         "assets/music.wav",
     }
-    
+
     -- Start loading with progress
     RL.BeginAssetLoading(#assets)
-    
+
     -- Load each asset
     for i, path in ipairs(assets) do
         RL.UpdateAssetLoading(path)
-        
+
         -- Your loading code
         if path:match("%.png$") then
             textures[i] = RL.LoadTexture(path)
@@ -215,7 +215,7 @@ function RL.init()
             sounds[i] = RL.LoadSound(path)
         end
     end
-    
+
     -- Finish loading
     RL.EndAssetLoading()
 end
