@@ -120,9 +120,17 @@ Options:
 ✅ Build compiles successfully
 ✅ Logos and font embedded automatically
 ✅ Asset loading API functions registered
-✅ Splash screens implemented
+✅ Splash screens implemented and working
 ✅ Console control working (Windows)
 ✅ Documentation complete
+✅ SEGV crash fixed - window initializes before splash screens
+✅ Runs successfully with and without --no-logo flag
+
+## Known Changes from Original ReiLua
+- `RL.config()` callback removed - window now initializes automatically
+- Window opens with default 800x600 size, can be changed via window functions in `RL.init()`
+- Custom font (Oleaguid) always loaded for consistent appearance
+- `stateContextInit()` merged into `stateInit()`
 
 ## Next Steps
 1. Test with actual embedded Lua files
