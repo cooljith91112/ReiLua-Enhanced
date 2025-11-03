@@ -7,13 +7,18 @@ echo "ReiLua - Release Build"
 echo "================================"
 echo ""
 
+# Get the script directory and navigate to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/.." || exit 1
+
 # Check if we're in the right directory
 if [ ! -f "CMakeLists.txt" ]; then
-    echo "ERROR: Please run this script from the ReiLua root directory"
+    echo "ERROR: Cannot find CMakeLists.txt in project root"
     exit 1
 fi
 
-# Navigate to build directory
+# Create and navigate to build directory
+mkdir -p build
 cd build || exit 1
 
 # Clean old embedded files

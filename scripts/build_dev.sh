@@ -7,7 +7,12 @@ echo "ReiLua - Development Build"
 echo "================================"
 echo ""
 
-# Navigate to build directory
+# Get the script directory and navigate to project root
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/.." || exit 1
+
+# Create and navigate to build directory
+mkdir -p build
 cd build || exit 1
 
 # Clean old embedded files (important for dev builds!)

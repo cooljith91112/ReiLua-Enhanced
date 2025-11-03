@@ -7,13 +7,17 @@ echo ReiLua - Release Build
 echo ================================
 echo.
 
+REM Get script directory and navigate to project root
+cd /d "%~dp0.."
+
 REM Check if we're in the right directory
 if not exist "CMakeLists.txt" (
-    echo ERROR: Please run this script from the ReiLua root directory
+    echo ERROR: Cannot find CMakeLists.txt in project root
     exit /b 1
 )
 
-REM Navigate to build directory
+REM Create and navigate to build directory
+if not exist "build" mkdir build
 cd build
 if errorlevel 1 (
     echo ERROR: Cannot access build directory
