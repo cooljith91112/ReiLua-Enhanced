@@ -62,7 +62,7 @@ ReiLua.exe --log --no-logo
 
 The splash screen system is implemented in C and runs before any Lua code executes:
 
-1. **Logo Embedding**: During build, `embed_logo.py` converts PNG files to C byte arrays
+1. **Logo Embedding**: During build, `scripts/embed_logo.py` converts PNG files to C byte arrays
 2. **Initialization**: Before calling `RL.init()`, the engine initializes splash screens
 3. **Display Loop**: A dedicated loop handles timing, fading, and rendering
 4. **Cleanup**: After completion, resources are freed and Lua code begins
@@ -71,7 +71,7 @@ The splash screen system is implemented in C and runs before any Lua code execut
 
 - `src/splash.c` - Splash screen implementation
 - `include/splash.h` - Header file
-- `embed_logo.py` - Python script to embed logo images
+- `scripts/embed_logo.py` - Python script to embed logo images
 - `logo/raylib_logo.png` - Raylib logo (embedded)
 - `logo/reilua_logo.png` - ReiLua logo (embedded)
 
@@ -79,7 +79,7 @@ The splash screen system is implemented in C and runs before any Lua code execut
 
 The CMakeLists.txt automatically:
 
-1. Runs `embed_logo.py` during build
+1. Runs `scripts/embed_logo.py` during build
 2. Generates `embedded_logo.h` with logo data
 3. Defines `EMBED_LOGO` flag
 4. Compiles `splash.c` with the project
@@ -205,7 +205,7 @@ ReiLua.exe MyGame/
 
 **Solutions**:
 - Ensure Python 3 is installed and in PATH
-- Check `embed_logo.py` has correct paths
+- Check `scripts/embed_logo.py` has correct paths
 - Verify `logo/` folder exists with both PNG files
 - Check CMake output for specific error messages
 

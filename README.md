@@ -297,11 +297,11 @@ One-command builds for development and release:
 **Development Build (Fast Iteration):**
 ```bash
 # Windows
-build_dev.bat
+scripts\build_dev.bat
 
 # Linux/Unix
-chmod +x build_dev.sh
-./build_dev.sh
+chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
 ```
 - No embedding
 - Fast build times
@@ -319,10 +319,10 @@ copy ..\your_game\assets\* assets\
 cd ..
 
 # Windows
-build_release.bat
+scripts\build_release.bat
 
 # Linux/Unix
-./build_release.sh
+scripts/build_release.sh
 ```
 - Embeds all Lua files
 - Embeds all assets
@@ -389,10 +389,10 @@ The given file will be called with `dofile`.
 Generate API.md and ReiLua_API.lua from the build folder:
 
 ```bash
-ReiLua -i ../docgen.lua
+ReiLua -i ../tools/docgen.lua
 ```
 
-**Tip:** Use ReiLua_API.lua in your project folder to provide annotations when using "Lua Language Server".
+**Tip:** Use tools/ReiLua_API.lua in your project folder to provide annotations when using "Lua Language Server".
 
 ## Building from Source
 
@@ -456,7 +456,7 @@ copy liblua.a path\to\ReiLua\lib\
 **Quick Method (Recommended):**
 ```bash
 cd ReiLua
-build_dev.bat
+scripts\build_dev.bat
 ```
 
 **Manual Method:**
@@ -494,8 +494,8 @@ Move both `.a` files to the `ReiLua/lib` folder.
 **Quick Method (Recommended):**
 ```bash
 cd ReiLua
-chmod +x build_dev.sh
-./build_dev.sh
+chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
 ```
 
 **Manual Method:**
@@ -639,8 +639,8 @@ copy ..\MyGame\assets\* assets\
 
 ```bash
 cd ..
-build_release.bat
-# Or: ./build_release.sh on Linux
+scripts\build_release.bat
+# Or: scripts/build_release.sh on Linux
 ```
 
 ### Step 4: Test
@@ -750,10 +750,10 @@ Create `.zed/settings.json` in your project root:
 
 ### Copy ReiLua API Definitions
 
-Copy `ReiLua_API.lua` to your project folder. This provides autocomplete and documentation for all ReiLua functions.
+Copy `tools/ReiLua_API.lua` to your project folder. This provides autocomplete and documentation for all ReiLua functions.
 
 ```bash
-copy path\to\ReiLua\ReiLua_API.lua your_game\
+copy path\to\ReiLua\tools\ReiLua_API.lua your_game\
 ```
 
 ### Keyboard Shortcuts
@@ -832,8 +832,8 @@ path\to\ReiLua.exe --log --no-logo
 
 ### Quick References
 
-- **API.md** - All ReiLua/Raylib functions
-- **ReiLua_API.lua** - Lua annotations for IDE autocomplete
+- **docs/API.md** - All ReiLua/Raylib functions
+- **tools/ReiLua_API.lua** - Lua annotations for IDE autocomplete
 - **examples/** - Example games and demos
 
 ## Troubleshooting
@@ -868,7 +868,7 @@ path\to\ReiLua.exe --log --no-logo
 **Build fails:**
 - Check CMake and compiler are installed and in PATH
 - Verify `libraylib.a` and `liblua.a` are in `lib/` folder
-- Try clean build: `build_dev.bat clean`
+- Try clean build: `scripts\build_dev.bat clean`
 
 ### Getting Help
 

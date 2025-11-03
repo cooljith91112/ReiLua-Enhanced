@@ -51,10 +51,10 @@ Successfully ported embedded assets, splash screens, and asset loading features 
 
 ### New Files
 - **Python Scripts:**
-  - `embed_lua.py` - Embeds Lua files into C header
-  - `embed_assets.py` - Embeds asset files into C header
-  - `embed_logo.py` - Embeds splash screen logos
-  - `embed_font.py` - Embeds custom font
+  - `scripts/embed_lua.py` - Embeds Lua files into C header
+  - `scripts/embed_assets.py` - Embeds asset files into C header
+  - `scripts/embed_logo.py` - Embeds splash screen logos
+  - `scripts/embed_font.py` - Embeds custom font
 
 - **Source Files:**
   - `src/splash.c` - Splash screen implementation
@@ -72,8 +72,8 @@ Successfully ported embedded assets, splash screens, and asset loading features 
   - `BUILD_SCRIPTS.md` - Build scripts documentation
 
 - **Build Scripts:**
-  - `build_dev.bat` / `build_dev.sh` - One-command development builds
-  - `build_release.bat` / `build_release.sh` - One-command release builds with embedding
+  - `scripts\build_dev.bat` / `scripts/build_dev.sh` - One-command development builds
+  - `scripts\build_release.bat` / `scripts/build_release.sh` - One-command release builds with embedding
 
 - **Icon and Resources:**
   - `icon.ico` - Default Windows executable icon
@@ -94,10 +94,10 @@ Successfully ported embedded assets, splash screens, and asset loading features 
 **Development (Fast Iteration):**
 ```bash
 # Windows
-build_dev.bat
+scripts\build_dev.bat
 
 # Linux/Unix  
-./build_dev.sh
+scripts/build_dev.sh
 ```
 
 **Release (Single Executable):**
@@ -112,10 +112,10 @@ copy ..\assets\* assets\
 cd ..
 
 # Windows
-build_release.bat
+scripts\build_release.bat
 
 # Linux/Unix
-./build_release.sh
+scripts/build_release.sh
 ```
 
 ### Manual Build

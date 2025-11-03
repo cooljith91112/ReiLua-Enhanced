@@ -7,7 +7,11 @@ echo ReiLua - Development Build
 echo ================================
 echo.
 
-REM Navigate to build directory
+REM Get script directory and navigate to project root
+cd /d "%~dp0.."
+
+REM Create and navigate to build directory
+if not exist "build" mkdir build
 cd build
 if errorlevel 1 (
     echo ERROR: Cannot access build directory

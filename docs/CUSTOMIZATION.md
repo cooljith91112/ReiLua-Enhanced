@@ -371,7 +371,7 @@ Before releasing your game:
 
 **Splash screens don't show changes:**
 - Rebuild with clean build
-- Check `embed_logo.py` ran successfully
+- Check `scripts/embed_logo.py` ran successfully
 - Verify logo files exist in `logo/` folder
 
 **Executable name unchanged:**

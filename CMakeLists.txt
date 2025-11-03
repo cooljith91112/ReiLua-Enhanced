@@ -35,7 +35,7 @@ set( LOGO_FILES
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h
-	COMMAND python ${CMAKE_SOURCE_DIR}/embed_logo.py 
+	COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_logo.py 
 		${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h 
 		${CMAKE_SOURCE_DIR}/logo/raylib_logo.png 
 		${CMAKE_SOURCE_DIR}/logo/reilua_logo.png
@@ -50,7 +50,7 @@ set( FONT_FILE "${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf" )
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h
-	COMMAND python ${CMAKE_SOURCE_DIR}/embed_font.py 
+	COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_font.py 
 		${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h 
 		${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf
 	DEPENDS ${FONT_FILE}
@@ -73,7 +73,7 @@ if( EMBED_MAIN )
 	if( LUA_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h
-			COMMAND python ${CMAKE_SOURCE_DIR}/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
+			COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
 			DEPENDS ${LUA_FILES}
 			COMMENT "Embedding Lua files into executable..."
 		)
@@ -90,7 +90,7 @@ if( EMBED_ASSETS )
 	if( ASSET_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
-			COMMAND python ${CMAKE_SOURCE_DIR}/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
+			COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
 			DEPENDS ${ASSET_FILES}
 			COMMENT "Embedding asset files into executable..."
 		)

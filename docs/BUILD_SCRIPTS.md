@@ -5,12 +5,12 @@ ReiLua includes automated build scripts for easy development and release builds.
 ## Available Scripts
 
 ### Development Build Scripts
-- **Windows**: `build_dev.bat`
-- **Linux/Unix**: `build_dev.sh`
+- **Windows**: `scripts\build_dev.bat`
+- **Linux/Unix**: `scripts/build_dev.sh`
 
 ### Release Build Scripts  
-- **Windows**: `build_release.bat`
-- **Linux/Unix**: `build_release.sh`
+- **Windows**: `scripts\build_release.bat`
+- **Linux/Unix**: `scripts/build_release.sh`
 
 ## Development Build
 
@@ -21,13 +21,13 @@ Fast iteration during game development with external Lua files and assets.
 
 **Windows:**
 ```cmd
-build_dev.bat
+scripts\build_dev.bat
 ```
 
 **Linux/Unix:**
 ```bash
-chmod +x build_dev.sh
-./build_dev.sh
+chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
 ```
 
 ### Features
@@ -36,7 +36,7 @@ chmod +x build_dev.sh
 - ✅ Edit code and assets without rebuilding
 - ✅ Automatic cleanup of embedded files
 - ✅ Warns if Lua files or assets are in build directory
-- ✅ Optional clean build: `build_dev.bat clean` or `./build_dev.sh clean`
+- ✅ Optional clean build: `scripts\build_dev.bat clean` or `scripts/build_dev.sh clean`
 
 ### Output
 - Development executable: `build/ReiLua.exe`
@@ -69,13 +69,13 @@ copy ..\your_game\assets\* assets\
 
 **Windows:**
 ```cmd
-build_release.bat
+scripts\build_release.bat
 ```
 
 **Linux/Unix:**
 ```bash
-chmod +x build_release.sh
-./build_release.sh
+chmod +x scripts/build_release.sh
+scripts/build_release.sh
 ```
 
 ### Features
@@ -133,7 +133,7 @@ After building, the executable will be named `YourGameName.exe`.
 
 ```bash
 # Initial setup
-build_dev.bat
+scripts\build_dev.bat
 
 # Edit your Lua files in your game directory
 # ... make changes ...
@@ -143,7 +143,7 @@ cd your_game
 path\to\build\ReiLua.exe
 
 # If you modify C code, rebuild
-build_dev.bat
+scripts\build_dev.bat
 ```
 
 ### Release Workflow
@@ -157,7 +157,7 @@ copy ..\your_game\assets\* assets\
 
 # 2. Build release
 cd ..
-build_release.bat
+scripts\build_release.bat
 
 # 3. Test
 cd build
@@ -181,7 +181,7 @@ ReiLua.exe --log
 ### "Build failed"
 - Check compiler errors in output
 - Ensure all dependencies are installed
-- Try clean build: `build_dev.bat clean`
+- Try clean build: `scripts\build_dev.bat clean`
 
 ### Development build embedding warning
 - The dev build script warns if it finds Lua files or assets in build/
