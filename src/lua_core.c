@@ -15,6 +15,21 @@
 #include "reasings.h"
 #include "bitwiseOp.h"
 
+#ifdef EMBED_MAIN
+	#include "embedded_main.h"
+#endif
+
+#ifdef EMBED_ASSETS
+	#include "embedded_assets.h"
+#endif
+
+/* Asset loading progress tracking (non-static so core.c can access) */
+int g_totalAssets = 0;
+int g_loadedAssets = 0;
+char g_currentAssetName[256] = { '\0' };
+bool g_showLoadingScreen = false;
+float g_loadingProgress = 0.0f;
+
 #ifdef PLATFORM_DESKTOP
 	#include "platforms/core_desktop_glfw.c"
 #elif PLATFORM_DESKTOP_SDL2
@@ -23,6 +38,152 @@
 	#include "platforms/core_desktop_sdl3.c"
 #elif PLATFORM_WEB
 	#include "platforms/core_web.c"
+#endif
+
+/* Draw a nice loading screen with progress bar (non-static so core.c can call it) */
+void drawLoadingScreen() {
+	int screenWidth = GetScreenWidth();
+	int screenHeight = GetScreenHeight();
+	
+	BeginDrawing();
+	ClearBackground( BLACK );
+	
+	int centerX = screenWidth / 2;
+	int centerY = screenHeight / 2;
+	
+	const char* title = "LOADING";
+	int titleSize = 32;
+	int titleWidth = MeasureText( title, titleSize );
+	
+	DrawText( title, centerX - titleWidth / 2, centerY - 80, titleSize, WHITE );
+	
+	static float dotTime = 0.0f;
+	dotTime += 0.016f;
+	int dotCount = (int)(dotTime * 2.0f) % 4;
+	
+	int dotStartX = centerX + titleWidth / 2 + 10;
+	int dotY = centerY - 80 + titleSize - 12;
+	for ( int i = 0; i < dotCount; i++ ) {
+		DrawRectangle( dotStartX + i * 8, dotY, 4, 4, WHITE );
+	}
+	
+	int barWidth = 200;
+	int barHeight = 16;
+	int barX = centerX - barWidth / 2;
+	int barY = centerY;
+	
+	DrawRectangle( barX - 2, barY - 2, barWidth + 4, barHeight + 4, WHITE );
+	DrawRectangle( barX, barY, barWidth, barHeight, BLACK );
+	
+	int fillWidth = (int)(barWidth * g_loadingProgress);
+	if ( fillWidth > 0 ) {
+		DrawRectangle( barX, barY, fillWidth, barHeight, WHITE );
+		
+		for ( int y = 0; y < barHeight; y += 2 ) {
+			for ( int x = 0; x < fillWidth; x += 4 ) {
+				if ( (x + y) % 4 == 0 ) {
+					DrawRectangle( barX + x, barY + y, 1, 1, BLACK );
+				}
+			}
+		}
+	}
+	
+	if ( g_totalAssets > 0 ) {
+		char progressText[32];
+		sprintf( progressText, "%d/%d", g_loadedAssets, g_totalAssets );
+		int progressWidth = MeasureText( progressText, 16 );
+		DrawText( progressText, centerX - progressWidth / 2, barY + barHeight + 12, 16, WHITE );
+	}
+	
+	if ( g_currentAssetName[0] != '\0' ) {
+		int assetNameWidth = MeasureText( g_currentAssetName, 10 );
+		DrawText( g_currentAssetName, centerX - assetNameWidth / 2, barY + barHeight + 36, 10, WHITE );
+	}
+	
+	int cornerSize = 8;
+	int margin = 40;
+	
+	DrawRectangle( margin, margin, cornerSize, 2, WHITE );
+	DrawRectangle( margin, margin, 2, cornerSize, WHITE );
+	
+	DrawRectangle( screenWidth - margin - cornerSize, margin, cornerSize, 2, WHITE );
+	DrawRectangle( screenWidth - margin - 2, margin, 2, cornerSize, WHITE );
+	
+	DrawRectangle( margin, screenHeight - margin - cornerSize, 2, cornerSize, WHITE );
+	DrawRectangle( margin, screenHeight - margin - 2, cornerSize, 2, WHITE );
+	
+	DrawRectangle( screenWidth - margin - cornerSize, screenHeight - margin - 2, cornerSize, 2, WHITE );
+	DrawRectangle( screenWidth - margin - 2, screenHeight - margin - cornerSize, 2, cornerSize, WHITE );
+	
+	EndDrawing();
+}
+
+#ifdef EMBED_MAIN
+/* Custom loader for embedded Lua files */
+static int embedded_lua_loader( lua_State* L ) {
+	const char* name = lua_tostring( L, 1 );
+	if ( name == NULL ) return 0;
+	
+	for ( int i = 0; i < embedded_lua_file_count; i++ ) {
+		const EmbeddedLuaFile* file = &embedded_lua_files[i];
+		
+		const char* basename = file->name;
+		size_t name_len = strlen( name );
+		size_t base_len = strlen( basename );
+		
+		if ( strcmp( basename, name ) == 0 || 
+		     ( base_len > 4 && strcmp( basename + base_len - 4, ".lua" ) == 0 && 
+		       strncmp( basename, name, base_len - 4 ) == 0 && name_len == base_len - 4 ) ) {
+			
+			if ( luaL_loadbuffer( L, (const char*)file->data, file->size, file->name ) == 0 ) {
+				return 1;
+			}
+			else {
+				lua_pushfstring( L, "\n\tembedded loader error: %s", lua_tostring( L, -1 ) );
+				return 1;
+			}
+		}
+	}
+	
+	lua_pushfstring( L, "\n\tno embedded file '%s'", name );
+	return 1;
+}
+#endif
+
+#ifdef EMBED_ASSETS
+/* Helper function to find embedded asset by name */
+static const EmbeddedAsset* find_embedded_asset( const char* name ) {
+	if ( name == NULL ) return NULL;
+	
+	for ( int i = 0; i < embedded_asset_count; i++ ) {
+		if ( strcmp( embedded_assets[i].name, name ) == 0 ) {
+			return &embedded_assets[i];
+		}
+	}
+	return NULL;
+}
+
+/* Override LoadFileData to check embedded assets first */
+unsigned char* LoadFileData_Embedded( const char* fileName, int* dataSize ) {
+	const EmbeddedAsset* asset = find_embedded_asset( fileName );
+	if ( asset != NULL ) {
+		*dataSize = asset->size;
+		unsigned char* data = (unsigned char*)malloc( asset->size );
+		if ( data != NULL ) {
+			memcpy( data, asset->data, asset->size );
+		}
+		return data;
+	}
+	return LoadFileData( fileName, dataSize );
+}
+
+/* Check if file exists in embedded assets */
+bool FileExists_Embedded( const char* fileName ) {
+	if ( find_embedded_asset( fileName ) != NULL ) {
+		return true;
+	}
+	return FileExists( fileName );
+}
 #endif
 
 /* Custom implementation since LuaJIT doesn't have lua_geti. */
@@ -1446,11 +1607,51 @@ int luaTraceback( lua_State* L ) {
 	return 1;
 }
 
-void luaCallMain() {
+bool luaCallMain() {
 	lua_State* L = state->luaState;
 
 	char path[ STRING_LEN ] = { '\0' };
 
+	/* Show loading screen */
+	BeginDrawing();
+	ClearBackground( RAYWHITE );
+	const char* loadingText = "Loading...";
+	int fontSize = 40;
+	int textWidth = MeasureText( loadingText, fontSize );
+	DrawText( loadingText, ( GetScreenWidth() - textWidth ) / 2, GetScreenHeight() / 2 - fontSize / 2, fontSize, DARKGRAY );
+	EndDrawing();
+
+#ifdef EMBED_MAIN
+	/* Register custom loader for embedded files */
+	lua_getglobal( L, "package" );
+	lua_getfield( L, -1, "loaders" );
+	if ( lua_isnil( L, -1 ) ) {
+		lua_pop( L, 1 );
+		lua_getfield( L, -1, "searchers" ); /* Lua 5.2+ uses 'searchers' */
+	}
+	
+	/* Insert our loader at position 2 (before file loaders) */
+	lua_len( L, -1 );
+	int num_loaders = lua_tointeger( L, -1 );
+	lua_pop( L, 1 );
+	for ( int i = num_loaders; i >= 2; i-- ) {
+		lua_rawgeti( L, -1, i );
+		lua_rawseti( L, -2, i + 1 );
+	}
+	lua_pushcfunction( L, embedded_lua_loader );
+	lua_rawseti( L, -2, 2 );
+	lua_pop( L, 2 ); /* Pop loaders/searchers and package */
+	
+	/* Load from embedded data */
+	if ( luaL_loadbuffer( L, (const char*)embedded_main_lua, embedded_main_lua_len, "main.lua" ) != 0 ) {
+		TraceLog( LOG_ERROR, "Lua error loading embedded main.lua: %s\n", lua_tostring( L, -1 ) );
+		return false;
+	}
+	if ( lua_pcall( L, 0, 0, 0 ) != 0 ) {
+		TraceLog( LOG_ERROR, "Lua error executing embedded main.lua: %s\n", lua_tostring( L, -1 ) );
+		return false;
+	}
+#else
 /* If web, set path to resources folder. */
 #ifdef PLATFORM_WEB
 	snprintf( path, STRING_LEN, "main.lua" );
@@ -1467,17 +1668,16 @@ void luaCallMain() {
 #endif
 	if ( !FileExists( path ) ) {
 		TraceLog( LOG_ERROR, "Cannot find file: %s\n", path );
-		state->run = false;
-		return;
+		return false;
 	}
 	luaL_dofile( L, path );
 
 	/* Check errors in main.lua */
 	if ( lua_tostring( L, -1 ) ) {
 		TraceLog( LOG_ERROR, "Lua error: %s\n", lua_tostring( L, -1 ) );
-		state->run = false;
-		return;
+		return false;
 	}
+#endif
 	lua_pushcfunction( L, luaTraceback );
 	int tracebackidx = lua_gettop( L );
 	/* Apply custom callback here. */
@@ -1489,8 +1689,7 @@ void luaCallMain() {
 	if ( lua_isfunction( L, -1 ) ) {
 		if ( lua_pcall( L, 0, 0, tracebackidx ) != 0 ) {
 			TraceLog( LOG_ERROR, "Lua error: %s", lua_tostring( L, -1 ) );
-			state->run = false;
-			return;
+			return false;
 		}
 	}
 	lua_pop( L, -1 );
@@ -1502,8 +1701,25 @@ void luaCallMain() {
 		stateContextInit();
 	}
 	else {
-		state->run = false;
+		return false;
 	}
+
+	lua_getglobal( L, "RL" );
+	lua_getfield( L, -1, "init" );
+
+	if ( lua_isfunction( L, -1 ) ) {
+		if ( lua_pcall( L, 0, 0, tracebackidx ) != 0 ) {
+			TraceLog( LOG_ERROR, "Lua error: %s", lua_tostring( L, -1 ) );
+			return false;
+		}
+	}
+	else {
+		TraceLog( LOG_ERROR, "%s", "No Lua init found!" );
+		return false;
+	}
+	lua_pop( L, -1 );
+
+	return state->run;
 }
 
 void luaCallInit() {
@@ -1789,6 +2005,10 @@ void luaRegister() {
 	assingGlobalFunction( "GetPrevDirectoryPath", lcoreGetPrevDirectoryPath );
 	assingGlobalFunction( "GetWorkingDirectory", lcoreGetWorkingDirectory );
 	assingGlobalFunction( "GetApplicationDirectory", lcoreGetApplicationDirectory );
+		/* Asset loading functions. */
+	assingGlobalFunction( "BeginAssetLoading", lcoreBeginAssetLoading );
+	assingGlobalFunction( "UpdateAssetLoading", lcoreUpdateAssetLoading );
+	assingGlobalFunction( "EndAssetLoading", lcoreEndAssetLoading );
 	assingGlobalFunction( "MakeDirectory", lcoreMakeDirectory );
 	assingGlobalFunction( "ChangeDirectory", lcoreChangeDirectory );
 	assingGlobalFunction( "IsPathFile", lcoreIsPathFile );

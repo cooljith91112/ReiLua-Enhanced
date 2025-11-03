@@ -4,6 +4,14 @@
 #include "textures.h"
 #include "lua_core.h"
 
+/* Forward declarations from lua_core.c for asset loading */
+extern int g_totalAssets;
+extern int g_loadedAssets;
+extern char g_currentAssetName[256];
+extern bool g_showLoadingScreen;
+extern float g_loadingProgress;
+extern void drawLoadingScreen();
+
 static size_t getBufferElementSize( Buffer* buffer ) {
 	switch ( buffer->type ) {
 		case BUFFER_UNSIGNED_CHAR: return sizeof( unsigned char );
@@ -1953,6 +1961,59 @@ int lcoreGetApplicationDirectory( lua_State* L ) {
 	lua_pushstring( L, GetApplicationDirectory() );
 
 	return 1;
+}
+
+/*
+> RL.BeginAssetLoading( int totalAssets )
+
+Initialize asset loading progress tracking
+
+- totalAssets: Total number of assets to load
+*/
+int lcoreBeginAssetLoading( lua_State* L ) {
+	g_totalAssets = luaL_checkinteger( L, 1 );
+	g_loadedAssets = 0;
+	g_showLoadingScreen = true;
+	g_loadingProgress = 0.0f;
+	g_currentAssetName[0] = '\0';
+
+	return 0;
+}
+
+/*
+> RL.UpdateAssetLoading( string assetName )
+
+Update loading progress for current asset
+
+- assetName: Name of the asset currently being loaded
+*/
+int lcoreUpdateAssetLoading( lua_State* L ) {
+	const char* assetName = luaL_checkstring( L, 1 );
+	strncpy( g_currentAssetName, assetName, sizeof(g_currentAssetName) - 1 );
+	g_currentAssetName[sizeof(g_currentAssetName) - 1] = '\0';
+
+	g_loadedAssets++;
+	g_loadingProgress = (float)g_loadedAssets / (float)g_totalAssets;
+
+	if ( g_showLoadingScreen ) {
+		drawLoadingScreen();
+	}
+
+	return 0;
+}
+
+/*
+> RL.EndAssetLoading()
+
+Finish asset loading and hide loading screen
+*/
+int lcoreEndAssetLoading( lua_State* L ) {
+	g_showLoadingScreen = false;
+	g_totalAssets = 0;
+	g_loadedAssets = 0;
+	g_currentAssetName[0] = '\0';
+
+	return 0;
 }
 
 /*
