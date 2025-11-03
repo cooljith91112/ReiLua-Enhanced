@@ -69,7 +69,6 @@ Distribution/
 - ✅ Single executable file
 - ✅ No external dependencies
 - ✅ Users can't modify game files
-- ✅ Professional distribution
 - ✅ Smaller download (no separate files)
 
 ## Quick Start

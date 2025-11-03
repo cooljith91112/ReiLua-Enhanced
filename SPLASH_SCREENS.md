@@ -1,12 +1,12 @@
 # Splash Screens
 
-ReiLua includes a built-in splash screen system that displays three professional splash screens before your game loads. This gives your game a polished, professional appearance right from startup.
+ReiLua includes a built-in splash screen system that displays splash screens before your game loads. This gives your game a polished appearance right from startup.
 
 ## Overview
 
 When you run your ReiLua game, it automatically shows two splash screens in sequence:
 
-1. **"INDRAJITH MAKES GAMES"** - Clean, bold text on Raylib red background (similar to Squid Game style)
+1. **Custom Text** - Clean, bold text on Raylib red background (similar to Squid Game style)
 2. **"Made using"** - Text with Raylib and ReiLua logos displayed side-by-side
 
 Each splash screen:
@@ -24,7 +24,7 @@ The logo images are **always embedded** into the executable in both development 
 - ✅ No external logo files needed
 - ✅ Consistent splash screens across all builds
 - ✅ No risk of missing logo files
-- ✅ Professional appearance from the start
+- ✅ Clean appearance from the start
 
 ### Asset Loading Integration
 
@@ -36,7 +36,7 @@ The splash screens display **before** your game's asset loading begins. This mea
 4. Asset loading with progress indicator (if you use it)
 5. Your game starts
 
-This creates a smooth, professional startup experience.
+This creates a smooth, polished startup experience.
 
 ## Skipping Splash Screens (Development)
 
@@ -90,13 +90,13 @@ No manual steps required - it just works!
 
 ### Changing Splash Screen Text
 
-To change "INDRAJITH MAKES GAMES" to your studio name:
+To change the default text to your studio name:
 
 1. Open `src/splash.c`
-2. Find the `drawIndrajithSplash()` function
-3. Change this line:
+2. Find the splash drawing function
+3. Change the text line:
    ```c
-   const char* text = "INDRAJITH MAKES GAMES";
+   const char* text = "YOUR STUDIO NAME";
    ```
 4. Rebuild the project
 
@@ -152,7 +152,7 @@ ReiLua.exe MyGame/
 **User Experience:**
 
 1. **Splash Screen 1** (4.1 seconds)
-   - "INDRAJITH MAKES GAMES" bold text
+   - Custom text displayed in bold (default: "YOUR STUDIO NAME")
    - Red background (Raylib color #E62937)
    - Subtle zoom effect
 
@@ -227,4 +227,4 @@ ReiLua --help
 
 ---
 
-The splash screen system adds a professional touch to your ReiLua games with minimal effort. Customize it to match your studio's branding and give players a great first impression!
+The splash screen system adds a polished touch to your ReiLua games with minimal effort. Customize it to match your studio's branding and give players a great first impression!

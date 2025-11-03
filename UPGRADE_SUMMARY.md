@@ -21,7 +21,7 @@ Successfully ported embedded assets, splash screens, and asset loading features 
 
 ### 3. **Splash Screens**
 - Always embedded dual logo splash screens
-- Screen 1: "INDRAJITH MAKES GAMES" on Raylib red background
+- Screen 1: Custom text on Raylib red background
 - Screen 2: "Made using" with Raylib and ReiLua logos
 - Each screen: 0.8s fade in, 2.5s display, 0.8s fade out
 - `--no-logo` flag to skip in development
@@ -141,7 +141,7 @@ cmake -G "MinGW Makefiles" .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON
 mingw32-make
 ```
 - Everything embedded in single .exe
-- Professional distribution package
+- Clean distribution package
 - No external file dependencies
 
 ## Command Line Options

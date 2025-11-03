@@ -10,7 +10,7 @@ ReiLua includes a built-in asset loading system with a nice loading screen UI th
   - Smooth progress bar with shimmer effect
   - Progress percentage (e.g., "3 / 10")
   - Current asset name being loaded
-  - Dark, professional color scheme
+  - Dark, clean color scheme
 - **Easy to Use** - Just 3 functions to show loading progress
 - **Works Everywhere** - Development and release builds
 
@@ -266,7 +266,7 @@ RL.EndAssetLoading()
 - You have more than 5-10 assets to load
 - Assets are large (images, sounds, fonts)
 - Loading might take more than 1 second
-- You want professional loading feedback
+- You want polished loading feedback
 
 **You can skip it when:**
 - You have very few, small assets
@@ -275,11 +275,11 @@ RL.EndAssetLoading()
 
 ## ✨ Benefits
 
-- ✅ Professional user experience
+- ✅ Polished user experience
 - ✅ User knows the game is loading, not frozen
 - ✅ Shows progress for large asset sets
 - ✅ Works with embedded assets
 - ✅ Minimal code required
 - ✅ Beautiful default UI
 
-The loading system makes your game feel polished and professional with just a few lines of code!
+The loading system makes your game feel polished with just a few lines of code!
