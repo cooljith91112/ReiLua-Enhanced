@@ -1,6 +1,15 @@
 #include "main.h"
 #include "state.h"
 #include "lua_core.h"
+#include "splash.h"
+
+#ifdef _WIN32
+// Forward declarations for Windows console functions
+extern __declspec(dllimport) int __stdcall AllocConsole(void);
+extern __declspec(dllimport) int __stdcall FreeConsole(void);
+extern __declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
+extern __declspec(dllimport) int __stdcall SetStdHandle(unsigned long nStdHandle, void* hHandle);
+#endif
 
 static inline void printVersion() {
 	if ( VERSION_DEV ) {
@@ -22,30 +31,92 @@ static inline void printVersion() {
 int main( int argn, const char** argc ) {
 	char basePath[ STRING_LEN ] = { '\0' };
 	bool interpret_mode = false;
+	bool show_console = false;
+	bool skip_splash = false;
+
+#ifdef _WIN32
+	/* Check for --log and --no-logo arguments */
+	for ( int i = 1; i < argn; i++ ) {
+		if ( strcmp( argc[i], "--log" ) == 0 ) {
+			show_console = true;
+		}
+		if ( strcmp( argc[i], "--no-logo" ) == 0 ) {
+			skip_splash = true;
+		}
+	}
+
+	/* Show or hide console based on --log argument */
+	if ( show_console ) {
+		/* Allocate a console if we don't have one */
+		if ( AllocConsole() ) {
+			freopen( "CONOUT$", "w", stdout );
+			freopen( "CONOUT$", "w", stderr );
+			freopen( "CONIN$", "r", stdin );
+		}
+	}
+	else {
+		/* Hide console window */
+		FreeConsole();
+	}
+#else
+	/* Check for --no-logo on non-Windows platforms */
+	for ( int i = 1; i < argn; i++ ) {
+		if ( strcmp( argc[i], "--no-logo" ) == 0 ) {
+			skip_splash = true;
+			break;
+		}
+	}
+#endif
 
 	if ( 1 < argn ) {
-		if ( strcmp( argc[1], "--version" ) == 0 || strcmp( argc[1], "-v" ) == 0 ) {
+		/* Skip --log and --no-logo flags to find the actual command */
+		int arg_index = 1;
+		while ( arg_index < argn && ( strcmp( argc[arg_index], "--log" ) == 0 || strcmp( argc[arg_index], "--no-logo" ) == 0 ) ) {
+			arg_index++;
+		}
+		
+		if ( arg_index < argn && ( strcmp( argc[arg_index], "--version" ) == 0 || strcmp( argc[arg_index], "-v" ) == 0 ) ) {
 			printVersion();
 			return 1;
 		}
-		else if ( strcmp( argc[1], "--help" ) == 0 || strcmp( argc[1], "-h" ) == 0 ) {
-			printf( "Usage: ReiLua [Options] [Directory to main.lua or main]\nOptions:\n-h --help\tThis help\n-v --version\tShow ReiLua version\n-i --interpret\tInterpret mode [File name]\n" );
+		else if ( arg_index < argn && ( strcmp( argc[arg_index], "--help" ) == 0 || strcmp( argc[arg_index], "-h" ) == 0 ) ) {
+			printf( "Usage: ReiLua [Options] [Directory to main.lua or main]\nOptions:\n-h --help\tThis help\n-v --version\tShow ReiLua version\n-i --interpret\tInterpret mode [File name]\n--log\t\tShow console for logging\n--no-logo\tSkip splash screens (development)\n" );
 			return 1;
 		}
-		else if ( strcmp( argc[1], "--interpret" ) == 0 || strcmp( argc[1], "-i" ) == 0 ) {
+		else if ( arg_index < argn && ( strcmp( argc[arg_index], "--interpret" ) == 0 || strcmp( argc[arg_index], "-i" ) == 0 ) ) {
 			interpret_mode = true;
 
-			if ( 2 < argn ) {
-				sprintf( basePath, "%s/%s", GetWorkingDirectory(), argc[2] );
+			if ( arg_index + 1 < argn ) {
+				sprintf( basePath, "%s/%s", GetWorkingDirectory(), argc[arg_index + 1] );
 			}
 		}
-		else{
-			sprintf( basePath, "%s/%s", GetWorkingDirectory(), argc[1] );
+		else if ( arg_index < argn ) {
+			sprintf( basePath, "%s/%s", GetWorkingDirectory(), argc[arg_index] );
+		}
+		else {
+			/* Only flags were provided, use default path search */
+			char testPath[ STRING_LEN ] = { '\0' };
+			sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
+			
+			if ( FileExists( testPath ) ) {
+				sprintf( basePath, "%s", GetWorkingDirectory() );
+			}
+			else {
+				sprintf( basePath, "%s", GetApplicationDirectory() );
+			}
 		}
 	}
-	/* If no argument given, assume main.lua is in exe directory. */
+	/* If no argument given, check current directory first, then exe directory. */
 	else {
-		sprintf( basePath, "%s", GetApplicationDirectory() );
+		char testPath[ STRING_LEN ] = { '\0' };
+		sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
+		
+		if ( FileExists( testPath ) ) {
+			sprintf( basePath, "%s", GetWorkingDirectory() );
+		}
+		else {
+			sprintf( basePath, "%s", GetApplicationDirectory() );
+		}
 	}
 
 	if ( interpret_mode ) {
@@ -65,15 +136,30 @@ int main( int argn, const char** argc ) {
 	else {
 		printVersion();
 		stateInit( argn, argc, basePath );
-		luaCallMain();
-		luaCallInit();
+		
+		/* Show splash screens if not skipped */
+		if ( !skip_splash ) {
+			splashInit();
+			bool splashDone = false;
+			
+			while ( !splashDone && !WindowShouldClose() ) {
+				float delta = GetFrameTime();
+				splashDone = splashUpdate( delta );
+				splashDraw();
+			}
+			
+			splashCleanup();
+		}
+		
+		/* Now run the main Lua program */
+		state->run = luaCallMain();
 
 		while ( state->run ) {
-			luaCallUpdate();
-			luaCallDraw();
 			if ( WindowShouldClose() ) {
 				state->run = false;
 			}
+			luaCallUpdate();
+			luaCallDraw();
 		}
 		luaCallExit();
 	}

@@ -11,10 +11,12 @@ project( ReiLua )
 set( CMAKE_C_STANDARD 99 ) # Requires C99 standard
 
 option( SHARED "Build using dynamic libraries." off )
-option( LUAJIT "Use LuaJIT." on )
+option( LUAJIT "Use LuaJIT." off )
 option( LUA_EVENTS "Enable Lua event callbacks (RL.event)." off )
 option( DYNAMIC_SYMBOLS "Expose all dynamic symbols with rdynamic." off )
 option( EXPOSE_API_SYMBOLS "Expose dynamic symbols only for get and push functions of variable types." off )
+option( EMBED_MAIN "Embed all Lua files from build directory into executable." off )
+option( EMBED_ASSETS "Embed all files from assets folder into executable." off )
 
 enum_option( PLATFORM "Desktop;Desktop_SDL2;Desktop_SDL3;Web" "Platform to build for." )
 
@@ -25,7 +27,80 @@ endif()
 
 file( GLOB SOURCES src/*.c )
 
+# Always embed logo files for splash screens
+set( LOGO_FILES 
+	"${CMAKE_SOURCE_DIR}/logo/raylib_logo.png"
+	"${CMAKE_SOURCE_DIR}/logo/reilua_logo.png"
+)
+
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h
+	COMMAND python ${CMAKE_SOURCE_DIR}/embed_logo.py 
+		${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h 
+		${CMAKE_SOURCE_DIR}/logo/raylib_logo.png 
+		${CMAKE_SOURCE_DIR}/logo/reilua_logo.png
+	DEPENDS ${LOGO_FILES}
+	COMMENT "Embedding logo files for splash screens..."
+)
+list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_LOGO" )
+
+# Always embed font file
+set( FONT_FILE "${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf" )
+
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h
+	COMMAND python ${CMAKE_SOURCE_DIR}/embed_font.py 
+		${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h 
+		${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf
+	DEPENDS ${FONT_FILE}
+	COMMENT "Embedding font file..."
+)
+list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_FONT" )
+
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 include_directories( include )
+
+# Add Windows resource file for icon and exe details
+if( WIN32 )
+	list( APPEND SOURCES ${CMAKE_SOURCE_DIR}/resources.rc )
+endif()
+
+# Embed Lua files if EMBED_MAIN is ON
+if( EMBED_MAIN )
+	file( GLOB LUA_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.lua" )
+	if( LUA_FILES )
+		add_custom_command(
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h
+			COMMAND python ${CMAKE_SOURCE_DIR}/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
+			DEPENDS ${LUA_FILES}
+			COMMENT "Embedding Lua files into executable..."
+		)
+		list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h )
+		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_MAIN" )
+	else()
+		message( WARNING "EMBED_MAIN is ON but no .lua files found in build directory!" )
+	endif()
+endif()
+
+# Embed asset files if EMBED_ASSETS is ON
+if( EMBED_ASSETS )
+	file( GLOB_RECURSE ASSET_FILES "${CMAKE_CURRENT_BINARY_DIR}/assets/*" )
+	if( ASSET_FILES )
+		add_custom_command(
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
+			COMMAND python ${CMAKE_SOURCE_DIR}/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
+			DEPENDS ${ASSET_FILES}
+			COMMENT "Embedding asset files into executable..."
+		)
+		list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h )
+		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_ASSETS" )
+	else()
+		message( WARNING "EMBED_ASSETS is ON but no files found in build/assets/ directory!" )
+	endif()
+endif()
+
 add_executable( ${PROJECT_NAME} ${SOURCES} )
 
 if( PLATFORM STREQUAL "Desktop" )

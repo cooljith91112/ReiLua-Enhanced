@@ -7,7 +7,10 @@
 typedef struct {
 	char* basePath;
 	bool run;
+	bool hasWindow;
 	bool gcUnload;
+	bool customFontLoaded;
+	Vector2 resolution;
 	int lineSpacing; /* We need to store copy here since raylib has it in static. */
 	Vector2 mouseOffset;
 	Vector2 mouseScale;
