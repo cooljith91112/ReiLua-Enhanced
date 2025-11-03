@@ -62,6 +62,11 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_FONT" )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 include_directories( include )
 
+# Add Windows resource file for icon and exe details
+if( WIN32 )
+	list( APPEND SOURCES ${CMAKE_SOURCE_DIR}/resources.rc )
+endif()
+
 # Embed Lua files if EMBED_MAIN is ON
 if( EMBED_MAIN )
 	file( GLOB LUA_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.lua" )
