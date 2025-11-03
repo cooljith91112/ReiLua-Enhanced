@@ -28,9 +28,9 @@ This enhanced version is built upon:
 
 ### Core Framework
 - **[Raylib](https://github.com/raysan5/raylib)** (v5.5) - A simple and easy-to-use library to enjoy videogames programming
-  - Created by Ramon Santamaria ([@raysan5](https://github.com/raysan5))
+  - Created by Ray(Ramon Santamaria) ([@raysan5](https://github.com/raysan5))
   - Licensed under the zlib/libpng license
-- **[ReiLua](https://github.com/Gamerfiend/ReiLua)** - The original Lua bindings for Raylib
+- **[ReiLua](https://github.com/nullstare/ReiLua)** - The original Lua bindings for Raylib
   - Created by Jussi Viitala
   - Licensed under the MIT license
 - **[Lua](https://www.lua.org/)** (v5.4) - Powerful, efficient, lightweight, embeddable scripting language
