@@ -1,0 +1,32 @@
+{
+  "inlay_hints": {
+    "enabled": true
+  },
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.runtime.version": "Lua 5.4",
+        "Lua.workspace.library": [
+          "."
+        ],
+        "Lua.completion.enable": true,
+        "Lua.completion.callSnippet": "Replace",
+        "Lua.completion.displayContext": 3,
+        "Lua.diagnostics.globals": [
+          "RL"
+        ],
+        "Lua.hint.enable": true,
+        "Lua.hint.paramName": "All",
+        "Lua.hint.setType": true,
+        "Lua.hint.paramType": true,
+        "Lua.diagnostics.disable": [
+          "lowercase-global",
+          "unused-local",
+          "duplicate-set-field",
+          "missing-fields",
+          "undefined-field"
+        ]
+      }
+    }
+  }
+}
