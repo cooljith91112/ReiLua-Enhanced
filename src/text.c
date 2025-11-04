@@ -185,7 +185,9 @@ Load font from file into GPU memory (VRAM)
 */
 int ltextLoadFont( lua_State* L ) {
 	if ( FileExists( luaL_checkstring( L, 1 ) ) ) {
-		uluaPushFont( L, LoadFont( lua_tostring( L, 1 ) ) );
+		Font font = LoadFont( lua_tostring( L, 1 ) );
+		SetTextureFilter( font.texture, TEXTURE_FILTER_POINT );
+		uluaPushFont( L, font );
 
 		return 1;
 	}
@@ -207,16 +209,19 @@ int ltextLoadFontEx( lua_State* L ) {
 	int fontSize = luaL_checkinteger( L, 2 );
 
 	if ( FileExists( luaL_checkstring( L, 1 ) ) ) {
+		Font font;
 		if ( lua_istable( L, 3 ) ) {
 			int codepointCount = uluaGetTableLen( L, 3 );
 			int codepoints[ codepointCount ];
 
 			getCodepoints( L, codepoints, 3 );
-			uluaPushFont( L, LoadFontEx( lua_tostring( L, 1 ), fontSize, codepoints, codepointCount ) );
-
-			return 1;
+			font = LoadFontEx( lua_tostring( L, 1 ), fontSize, codepoints, codepointCount );
 		}
-		uluaPushFont( L, LoadFontEx( lua_tostring( L, 1 ), fontSize, NULL, 0 ) );
+		else {
+			font = LoadFontEx( lua_tostring( L, 1 ), fontSize, NULL, 0 );
+		}
+		SetTextureFilter( font.texture, TEXTURE_FILTER_POINT );
+		uluaPushFont( L, font );
 
 		return 1;
 	}
@@ -238,7 +243,9 @@ int ltextLoadFontFromImage( lua_State* L ) {
 	Color key = uluaGetColor( L, 2 );
 	int firstChar = luaL_checkinteger( L, 3 );
 
-	uluaPushFont( L, LoadFontFromImage( *image, key, firstChar ) );
+	Font font = LoadFontFromImage( *image, key, firstChar );
+	SetTextureFilter( font.texture, TEXTURE_FILTER_POINT );
+	uluaPushFont( L, font );
 
 	return 1;
 }
@@ -255,17 +262,20 @@ int ltextLoadFontFromMemory( lua_State* L ) {
 	Buffer* fileData = uluaGetBuffer( L, 2 );
 	int fontSize = luaL_checkinteger( L, 3 );
 
+	Font font;
 	if ( lua_istable( L, 4 ) ) {
 		int codepointCount = uluaGetTableLen( L, 4 );
 		int codepoints[ codepointCount ];
 
 		getCodepoints( L, codepoints, 4 );
-		uluaPushFont( L, LoadFontFromMemory( fileType, fileData->data, fileData->size, fontSize, codepoints, codepointCount ) );
-
-		return 1;
+		font = LoadFontFromMemory( fileType, fileData->data, fileData->size, fontSize, codepoints, codepointCount );
 	}
-	/* If no codepoints provided. */
-	uluaPushFont( L, LoadFontFromMemory( fileType, fileData->data, fileData->size, fontSize, NULL, 0 ) );
+	else {
+		/* If no codepoints provided. */
+		font = LoadFontFromMemory( fileType, fileData->data, fileData->size, fontSize, NULL, 0 );
+	}
+	SetTextureFilter( font.texture, TEXTURE_FILTER_POINT );
+	uluaPushFont( L, font );
 
 	return 1;
 }

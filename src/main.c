@@ -142,7 +142,7 @@ int main( int argn, const char** argc ) {
 			splashInit();
 			bool splashDone = false;
 			
-			while ( !splashDone && !WindowShouldClose() ) {
+			while ( !splashDone ) {
 				float delta = GetFrameTime();
 				splashDone = splashUpdate( delta );
 				splashDraw();
