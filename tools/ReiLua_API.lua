@@ -9049,6 +9049,25 @@ function RL.GetKeyName( key, scancode ) end
 ---If the key is KEY_UNKNOWN or does not exist on the keyboard this method will return -1.
 ---- Success return int
 ---@param key integer
----@return any scancode 
+---@return any scancode
 function RL.GetKeyScancode( key ) end
+
+-- ReiLua-Enhanced - Asset Loading System
+
+---Initialize asset loading progress tracking and show loading screen.
+---Call this before loading assets to display a retro 1-bit style loading screen
+---with progress bar, animated dots, and asset name display.
+---@param totalAssets integer Total number of assets to load
+function RL.BeginAssetLoading( totalAssets ) end
+
+---Update asset loading progress and display current asset being loaded.
+---Call this after each asset is loaded to update the progress bar and counter.
+---The loading screen will show the asset name and update the progress (e.g., "3/10").
+---@param assetName string Name of the asset currently being loaded (e.g., "player.png", "music.ogg")
+function RL.UpdateAssetLoading( assetName ) end
+
+---Finish asset loading and hide the loading screen.
+---Call this after all assets have been loaded to dismiss the loading UI
+---and continue with your game initialization.
+function RL.EndAssetLoading() end
 
