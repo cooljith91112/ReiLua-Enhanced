@@ -495,7 +495,7 @@ int ltextDrawText( lua_State* L ) {
 	float fontSize = luaL_checknumber( L, 3 );
 	Color tint = uluaGetColor( L, 4 );
 
-	DrawText( luaL_checkstring( L, 1 ), position.x, position.y, fontSize, tint );
+	DrawTextEx( state->defaultFont, luaL_checkstring( L, 1 ), position, fontSize, fontSize/10, tint );
 
 	return 0;
 }

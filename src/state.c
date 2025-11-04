@@ -53,17 +53,31 @@ bool stateInit( int argn, const char** argc, const char* basePath ) {
 	SetTextureFilter( state->defaultFont.texture, TEXTURE_FILTER_POINT );
 	state->customFontLoaded = true;
 #else
-	/* Load from file (development mode) */
+	/* Load from file (development mode) - try both executable directory and working directory */
 	char fontPath[STRING_LEN];
-	snprintf( fontPath, STRING_LEN, "%sfonts/Oleaguid.ttf", state->basePath );
-
+	bool fontFound = false;
+	
+	/* Try executable directory first */
+	snprintf( fontPath, STRING_LEN, "%s/fonts/Oleaguid.ttf", GetApplicationDirectory() );
 	if ( FileExists( fontPath ) ) {
+		fontFound = true;
+	}
+	else {
+		/* Try working directory */
+		snprintf( fontPath, STRING_LEN, "%s/fonts/Oleaguid.ttf", GetWorkingDirectory() );
+		if ( FileExists( fontPath ) ) {
+			fontFound = true;
+		}
+	}
+
+	if ( fontFound ) {
 		state->defaultFont = LoadFontEx( fontPath, 48, NULL, 0 );
 		SetTextureFilter( state->defaultFont.texture, TEXTURE_FILTER_POINT );
 		state->customFontLoaded = true;
+		TraceLog( LOG_INFO, "Loaded custom font: %s", fontPath );
 	}
 	else {
-		TraceLog( LOG_WARNING, "Custom font not found at '%s', using default font", fontPath );
+		TraceLog( LOG_WARNING, "Custom font not found, using Raylib default font" );
 		state->defaultFont = GetFontDefault();
 		state->customFontLoaded = false;
 	}
