@@ -1,0 +1,2144 @@
+<!DOCTYPE HTML><html><head><title>Manual</title>
+<link rel="stylesheet" href="style.css"><meta charset="utf-8"></head><body>
+<div class="container"><div class="navigation">
+<a href="index.html">home</a> &middot; <a href="manual.html">manual</a> &middot; <a href="reference.html">reference</a>
+</div><h1>ReiLua Manual</h1>
+<h1>ReiLua - Enhanced Edition</h1>
+<p>> <strong>A modified version of ReiLua with embedded main.lua, embedded assets, splash screens, and asset loading system</strong></p>
+<h2>About This Version</h2>
+<p>This is an enhanced version of ReiLua featuring:</p>
+<ul>
+<li><strong>Embedded Lua Support</strong> - Bundle all your Lua code into a single executable</li>
+<li><strong>Embedded Assets</strong> - Package images, sounds, and other assets into your game</li>
+<li><strong>Splash Screens</strong> - Customizable startup screens featuring Raylib and ReiLua</li>
+<li><strong>Asset Loading System</strong> - Loading screen with progress tracking</li>
+<li><strong>Automated Build Scripts</strong> - One-command development and release builds</li>
+<li><strong>Console Control</strong> - Debug logging system for development</li>
+</ul>
+<h2>What is ReiLua?</h2>
+<p>ReiLua brings the power and simplicity of Raylib to the beginner-friendly Lua language in a straightforward manner. It is a loose binding to Raylib - some functions are excluded and some are added. The concept of pointing to a "main.lua" file and accessing functions "init", "update", and "draw" is borrowed from the Löve game framework.</p>
+<strong>Note:</strong> ReiLua is lovingly  handcrafted and will likely contain bugs and documentation errors, so it would be much appreciated if you would report any such findings.
+<strong>Reilua</strong> means "fair" in Finnish.
+<h2>Attributions</h2>
+<p>This enhanced version is built upon:</p>
+<h3>Core Framework</h3>
+<ul>
+<li><strong><a href="https://github.com/raysan5/raylib">Raylib</a></strong> (v5.5) - A simple and easy-to-use library to enjoy videogames programming</li>
+<li>Created by Ray(Ramon Santamaria) (<a href="https://github.com/raysan5">@raysan5</a>)</li>
+<li>Licensed under the zlib/libpng license</li>
+<li><strong><a href="https://github.com/nullstare/ReiLua">ReiLua</a></strong> - The original Lua bindings for Raylib</li>
+<li>Created by Jussi Viitala</li>
+<li>Licensed under the MIT license</li>
+<li><strong><a href="https://www.lua.org/">Lua</a></strong> (v5.4) - Powerful, efficient, lightweight, embeddable scripting language</li>
+</ul>
+<h3>Enhancements Added</h3>
+<ul>
+<li>Embedded Lua and asset support system</li>
+<li>Splash screen implementation</li>
+<li>Asset loading progress API with retro UI</li>
+<li>Build automation scripts</li>
+<li>Console control system</li>
+<li>Comprehensive documentation</li>
+</ul>
+<h3>Additional Components</h3>
+<ul>
+<li><strong>Raygui</strong> - Immediate mode GUI library</li>
+<li><strong>Raymath</strong> - Math utilities for game development</li>
+<li><strong>Lights</strong> - 3D lighting system</li>
+<li><strong>Easings</strong> - Easing functions for smooth animations</li>
+<li><strong>RLGL</strong> - OpenGL abstraction layer</li>
+</ul>
+<h3>Font</h3>
+<ul>
+<li><strong>Oleaguid</strong> - Custom pixel art font for splash and loading screens</li>
+</ul>
+<h2>Status</h2>
+<p>ReiLua is WIP and some planned raylib functionality is still missing, but it already has over 1000 functions. Current Raylib version is 5.5.</p>
+<h3>Included Submodules</h3>
+<ul>
+<li>Raygui</li>
+<li>Raymath</li>
+<li>Lights</li>
+<li>Easings</li>
+<li>RLGL</li>
+</ul>
+<h3>Missing Features</h3>
+<p>List of some MISSING features that are planned to be included:</p>
+<ul>
+<li>Core</li>
+<li>VR stereo config functions for VR simulator</li>
+</ul>
+<h2>Roadmap</h2>
+<ul>
+<li>v0.9</li>
+<li>Stability improvements</li>
+<li>Additional raylib bindings</li>
+<li>v1.0</li>
+<li>raylib 6.0 support</li>
+</ul>
+<h2>Quick Start</h2>
+<h3>For Game Developers</h3>
+<p>Development Mode (Fast Iteration):</p>
+<pre><code># 1. Create your game files
+GameFolder/
+├── main.lua
+├── assets/
+│   ├── player.png
+│   └── music.wav
+
+# 2. Run ReiLua pointing to your game folder
+ReiLua.exe GameFolder/
+
+# Or from your game folder
+cd GameFolder
+path/to/ReiLua.exe
+
+# Skip splash screens during development
+ReiLua.exe --no-logo
+
+# Enable console for debugging
+ReiLua.exe --log --no-logo
+</code></pre>
+<p>Release Mode (Single Executable):</p>
+<pre><code># See "Building for Release" section below
+</code></pre>
+<h3>Basic Example</h3>
+<p>Create a <code>main.lua</code> file:</p>
+<pre><code>local textColor = RL.BLACK
+local textPos = { 192, 200 }
+local textSize = 20
+local text = "Congrats! You created your first window!"
+
+function RL.init()
+	RL.SetWindowTitle( "First window" )
+	RL.SetWindowState( RL.FLAG_VSYNC_HINT )
+end
+
+function RL.update( delta )
+	if RL.IsKeyPressed( RL.KEY_ENTER ) then
+		local winSize = RL.GetScreenSize()
+		local measuredSize = RL.MeasureTextEx( RL.GetFontDefault(), text, textSize, 2 )
+
+		textColor = RL.BLUE
+		textPos = { winSize[1] / 2 - measuredSize[1] / 2, winSize[2] / 2 - measuredSize[2] / 2 }
+	end
+
+	if RL.IsKeyPressed( RL.KEY_SPACE ) then
+		textColor = RL.RED
+		textPos = { 192, 200 }
+	end
+end
+
+function RL.draw()
+	RL.ClearBackground( RL.RAYWHITE )
+	RL.DrawText( text, textPos, textSize, textColor )
+end
+</code></pre>
+<p>Run it:</p>
+<pre><code>ReiLua.exe --no-logo
+</code></pre>
+<h2>Framework Functions</h2>
+<p>ReiLua looks for a 'main.lua' or 'main' file as the entry point. There are seven Lua functions that the framework will call:</p>
+<ul>
+<li><strong><code>RL.init()</code></strong> - Called once at startup for initialization</li>
+<li><strong><code>RL.update(delta)</code></strong> - Called every frame before draw, receives delta time</li>
+<li><strong><code>RL.draw()</code></strong> - Called every frame for rendering</li>
+<li><strong><code>RL.event(event)</code></strong> - Called when events occur</li>
+<li><strong><code>RL.log(logLevel, message)</code></strong> - Called for logging</li>
+<li><strong><code>RL.exit()</code></strong> - Called when the application is closing</li>
+<li><strong><code>RL.config()</code></strong> - ⚠️ Deprecated in this version</li>
+</ul>
+<p>All functionality can be found in "API.md".</p>
+<h2>Enhanced Features</h2>
+<h3>1. Splash Screens</h3>
+<p>This version includes customizable splash screens that display at startup:</p>
+<strong>Screen 1:</strong> Custom text - Bold text on Raylib red background (customizable)
+<strong>Screen 2:</strong> "Made using" - Displays Raylib and ReiLua logos side-by-side
+<p>Each screen fades in (0.8s), displays (2.5s), and fades out (0.8s) for a total of ~8 seconds.</p>
+<p>Skip During Development:</p>
+<pre><code>ReiLua.exe --no-logo
+</code></pre>
+<p>Customize:</p>
+<ul>
+<li>Change text in <code>src/splash.c</code></li>
+<li>Replace logos in <code>logo/</code> folder</li>
+<li>Adjust timing with constants in <code>src/splash.c</code></li>
+</ul>
+<p>See <a href="manual.html">SPLASH_SCREENS.md</a> for full documentation.</p>
+<h3>2. Asset Loading System</h3>
+<p>Beautiful loading screen with progress tracking:</p>
+<pre><code>function RL.init()
+    -- List your assets
+    local assets = {
+        "assets/player.png",
+        "assets/enemy.png",
+        "assets/background.png",
+        "assets/music.wav",
+    }
+
+    -- Start loading with progress
+    RL.BeginAssetLoading(#assets)
+
+    -- Load each asset
+    for i, path in ipairs(assets) do
+        RL.UpdateAssetLoading(path)
+
+        -- Your loading code
+        if path:match("%.png$") then
+            textures[i] = RL.LoadTexture(path)
+        elseif path:match("%.wav$") then
+            sounds[i] = RL.LoadSound(path)
+        end
+    end
+
+    -- Finish loading
+    RL.EndAssetLoading()
+end
+</code></pre>
+<p>Features:</p>
+<ul>
+<li>Retro 1-bit pixel art aesthetic</li>
+<li>Animated loading text with dots</li>
+<li>Progress bar with dithering pattern</li>
+<li>Shows current asset name</li>
+<li>Progress counter (e.g., "3/10")</li>
+<li>Corner decorations</li>
+</ul>
+<p>See <a href="manual.html">ASSET_LOADING.md</a> for full documentation.</p>
+<h3>3. Embedded Lua Files</h3>
+<p>Bundle all your Lua code into the executable for easy distribution:</p>
+<pre><code># Copy Lua files to build directory
+cd build
+copy ..\your_game\*.lua .
+
+# Build with embedding
+cmake .. -DEMBED_MAIN=ON
+cmake --build . --config Release
+</code></pre>
+<p>Result: Single executable with all Lua code embedded!</p>
+<h3>4. Embedded Assets</h3>
+<p>Package images, sounds, fonts, and other assets into your executable:</p>
+<pre><code># Create assets folder and copy files
+cd build
+mkdir assets
+copy ..\your_game\assets\* assets\
+
+# Build with embedding
+cmake .. -DEMBED_ASSETS=ON
+cmake --build . --config Release
+</code></pre>
+<strong>Your Lua code doesn't change!</strong> Use the same paths:
+<pre><code>-- Works in both development and release
+playerImg = RL.LoadTexture("assets/player.png")
+music = RL.LoadSound("assets/music.wav")
+</code></pre>
+<p>See <a href="manual.html">EMBEDDING.md</a> for full documentation.</p>
+<h3>5. Console Control (Windows)</h3>
+<p>By default, ReiLua runs without a console window for a clean user experience. Enable it for debugging:</p>
+<pre><code># Show console for debugging
+ReiLua.exe --log
+
+# Combine with other options
+ReiLua.exe --log --no-logo
+ReiLua.exe --log path/to/game
+</code></pre>
+<p>This shows:</p>
+<ul>
+<li>TraceLog output</li>
+<li>Print statements</li>
+<li>Lua errors</li>
+<li>Debug information</li>
+</ul>
+<h3>6. Automated Build Scripts</h3>
+<p>One-command builds for development and release:</p>
+<p>Development Build (Fast Iteration):</p>
+<pre><code># Windows
+scripts\build_dev.bat
+
+# Linux/Unix
+chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
+</code></pre>
+<ul>
+<li>No embedding</li>
+<li>Fast build times</li>
+<li>Edit code without rebuilding</li>
+</ul>
+<p>Release Build (Distribution):</p>
+<pre><code># Prepare files first
+cd build
+copy ..\your_game\*.lua .
+mkdir assets
+copy ..\your_game\assets\* assets\
+
+# Build release
+cd ..
+
+# Windows
+scripts\build_release.bat
+
+# Linux/Unix
+scripts/build_release.sh
+</code></pre>
+<ul>
+<li>Embeds all Lua files</li>
+<li>Embeds all assets</li>
+<li>Creates single executable</li>
+<li>Release optimizations</li>
+</ul>
+<p>See <a href="manual.html">BUILD_SCRIPTS.md</a> for full documentation.</p>
+<h2>Command Line Options</h2>
+<pre><code>ReiLua [Options] [Directory to main.lua or main]
+
+Options:
+  -h, --help       Show help message
+  -v, --version    Show ReiLua version
+  -i, --interpret  Interpret mode [File name]
+  --log            Show console window for logging (Windows only)
+  --no-logo        Skip splash screens (development)
+</code></pre>
+<h3>Examples</h3>
+<pre><code># Run game in current directory
+ReiLua.exe
+
+# Run game in specific folder
+ReiLua.exe path/to/game/
+
+# Development mode (no splash, with console)
+ReiLua.exe --log --no-logo
+
+# Interpreter mode (run single script)
+ReiLua.exe -i script.lua
+
+# Show help
+ReiLua.exe --help
+
+# Show version
+ReiLua.exe --version
+</code></pre>
+<h2>Object Unloading</h2>
+<p>Some objects allocate memory that needs to be freed when no longer needed. By default, objects like Textures are unloaded by the Lua garbage collector. However, it's generally recommended to handle this manually in more complex projects:</p>
+<pre><code>RL.SetGCUnload()
+</code></pre>
+<h2>Interpreter Mode</h2>
+<p>ReiLua can run single Lua files using interpreter mode:</p>
+<pre><code>ReiLua -i hello.lua
+</code></pre>
+<p>The given file will be called with <code>dofile</code>.</p>
+<h2>Generate API Documentation</h2>
+<p>Generate API.md and ReiLua_API.lua from the build folder:</p>
+<pre><code>ReiLua -i ../tools/docgen.lua
+</code></pre>
+<strong>Tip:</strong> Use tools/ReiLua_API.lua in your project folder to provide annotations when using "Lua Language Server".
+<h2>Building from Source</h2>
+<h3>Prerequisites</h3>
+<p>You'll need to statically link Raylib and Lua to create the executable. This simplifies distribution, especially on Linux where different distros use different library versions.</p>
+<ul>
+<li><strong>Raylib</strong>: https://github.com/raysan5/raylib</li>
+<li><strong>Lua</strong>: https://github.com/lua/lua or https://github.com/LuaJIT/LuaJIT</li>
+<li><strong>CMake</strong>: https://cmake.org/download/</li>
+<li><strong>Build tools</strong>: MinGW (Windows), GCC/Make (Linux)</li>
+</ul>
+<strong>Note:</strong> Lua header files are from Lua 5.4.0. If using a different version, replace them.
+<h3>Windows</h3>
+<h4>1. Install Tools</h4>
+<ul>
+<li>Download <strong>w64devkit</strong> from https://github.com/skeeto/w64devkit</li>
+<li>Download <strong>CMake</strong> from https://cmake.org/download/ (install with PATH environment variables set)</li>
+</ul>
+<h4>2. Build Raylib</h4>
+<pre><code># Download Raylib source
+# Run w64devkit.exe and navigate to raylib/src
+cd raylib/src
+mingw32-make
+
+# Copy libraylib.a to ReiLua/lib folder
+copy libraylib.a path\to\ReiLua\lib\
+</code></pre>
+<h4>3. Build Lua</h4>
+<p>Download Lua source from https://github.com/lua/lua</p>
+<p>Modify Lua's makefile:</p>
+<pre><code># Change this:
+MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
+# To this:
+MYCFLAGS= $(LOCAL) -std=c99
+
+# Comment out or remove:
+MYLIBS= -ldl -lreadline
+</code></pre>
+<p>Build:</p>
+<pre><code># In w64devkit, navigate to Lua folder
+mingw32-make
+
+# Copy liblua.a to ReiLua/lib folder
+copy liblua.a path\to\ReiLua\lib\
+</code></pre>
+<h4>4. Build ReiLua</h4>
+<p>Quick Method (Recommended):</p>
+<pre><code>cd ReiLua
+scripts\build_dev.bat
+</code></pre>
+<p>Manual Method:</p>
+<pre><code>cd ReiLua\build
+cmake -G "MinGW Makefiles" ..
+mingw32-make
+</code></pre>
+<h4>5. Test</h4>
+<pre><code>cd build
+ReiLua.exe ..\examples\snake\
+</code></pre>
+<p>If you see a low-res snake racing off the window, success! Press Enter to reset.</p>
+<h3>Linux</h3>
+<h4>1. Install Dependencies</h4>
+<pre><code>sudo apt install build-essential cmake
+</code></pre>
+<h4>2. Build Raylib and Lua</h4>
+<p>Compile Raylib and Lua by following their instructions. They will compile to <code>libraylib.a</code> and <code>liblua.a</code> by default.</p>
+<p>Move both <code>.a</code> files to the <code>ReiLua/lib</code> folder.</p>
+<h4>3. Build ReiLua</h4>
+<p>Quick Method (Recommended):</p>
+<pre><code>cd ReiLua
+chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
+</code></pre>
+<p>Manual Method:</p>
+<pre><code>cd ReiLua/build
+cmake ..
+make
+</code></pre>
+<h4>4. Test</h4>
+<pre><code>./ReiLua ../examples/snake/
+</code></pre>
+<h3>MacOS</h3>
+<p>Not tested, but should work similarly to Linux.</p>
+<h3>Raspberry Pi</h3>
+<p>Works best when Raylib is compiled using <code>PLATFORM=DRM</code>. See Raylib build instructions for Raspberry Pi.</p>
+<p>Compile ReiLua with:</p>
+<pre><code>cmake .. -DDRM=ON
+</code></pre>
+<strong>Note:</strong> DRM should be launched from CLI, not in X.
+<h3>Web (Emscripten)</h3>
+<p>Compile Raylib for web following its instructions: https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)</p>
+<h4>1. Compile Lua for Web</h4>
+<p>Modify Lua's makefile:</p>
+<pre><code># Change:
+MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_USE_READLINE
+# To:
+MYCFLAGS= $(LOCAL) -std=c99
+
+# Change:
+MYLIBS= -ldl -lreadline
+# To:
+MYLIBS= -ldl
+
+# Change:
+CC= gcc
+# To:
+CC= emcc
+
+# Change:
+CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common -march=native
+# To:
+CFLAGS= -Wall -O2 $(MYCFLAGS) -fno-stack-protector -fno-common
+
+# Change:
+AR= ar rc
+# To:
+AR= emar
+
+# Change:
+$(AR) $@ $?
+# To:
+$(AR) rcs $@ $?
+</code></pre>
+<p>Build with <code>make</code> if emsdk environmental variables are correct.</p>
+<h4>2. Prepare Libraries</h4>
+<p>Put <code>libraylib.a</code> and <code>liblua.a</code> into <code>ReiLua/lib/web/</code>.</p>
+<h4>3. Create Resources Folder</h4>
+<pre><code>cd ReiLua/build
+mkdir resources
+# Copy main.lua to resources/
+# Copy assets to resources/
+</code></pre>
+<p>Structure:</p>
+<pre><code>ReiLua/
+└── build/
+    └── resources/
+        ├── main.lua
+        └── assets/
+</code></pre>
+<h4>4. Build</h4>
+<pre><code>cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=<YOUR_PATH>/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DPLATFORM=Web
+make
+</code></pre>
+<h4>5. Test</h4>
+<pre><code>python -m http.server 8080
+</code></pre>
+<p>Access in browser: <code>localhost:8080/ReiLua.html</code></p>
+<h2>Complete Release Workflow</h2>
+<h3>Step 1: Prepare Your Game</h3>
+<pre><code>MyGame/
+├── main.lua
+├── player.lua
+├── enemy.lua
+├── assets/
+│   ├── player.png
+│   ├── enemy.png
+│   └── music.wav
+</code></pre>
+<h3>Step 2: Copy Files to Build Directory</h3>
+<pre><code>cd ReiLua/build
+
+# Copy all Lua files
+copy ..\MyGame\*.lua .
+
+# Copy assets
+mkdir assets
+copy ..\MyGame\assets\* assets\
+# Or: xcopy /E /I ..\MyGame\assets assets
+</code></pre>
+<h3>Step 3: Build Release</h3>
+<pre><code>cd ..
+scripts\build_release.bat
+# Or: scripts/build_release.sh on Linux
+</code></pre>
+<h3>Step 4: Test</h3>
+<pre><code>cd build
+ReiLua.exe --log
+</code></pre>
+<p>Verify:</p>
+<ul>
+<li>No file loading errors</li>
+<li>Game runs correctly</li>
+<li>All assets load properly</li>
+</ul>
+<h3>Step 5: Distribute</h3>
+<pre><code>mkdir Distribution
+copy ReiLua.exe Distribution\YourGameName.exe
+</code></pre>
+<p>Your game is now a single executable ready for distribution!</p>
+<h2>Customizing Your Executable</h2>
+<h3>Change Executable Name</h3>
+<p>Edit <code>CMakeLists.txt</code>:</p>
+<pre><code>project( YourGameName )  # Change from "ReiLua"
+</code></pre>
+<h3>Add Custom Icon</h3>
+<p>Replace <code>icon.ico</code> with your own icon file, then rebuild.</p>
+<h3>Edit Executable Properties</h3>
+<p>Edit <code>resources.rc</code>:</p>
+<pre><code>VALUE "CompanyName", "Your Studio Name"
+VALUE "FileDescription", "Your Game Description"
+VALUE "ProductName", "Your Game Name"
+VALUE "LegalCopyright", "Copyright (C) Your Name, 2025"
+</code></pre>
+<h3>Customize Splash Screens</h3>
+<p>Edit <code>src/splash.c</code>:</p>
+<pre><code>const char* text = "YOUR STUDIO NAME";  // Change this
+</code></pre>
+<p>Replace logos:</p>
+<pre><code># Replace these files before building
+logo/raylib_logo.png
+logo/reilua_logo.png
+</code></pre>
+<h2>Setting Up Zed Editor</h2>
+<p>Zed is a modern, high-performance code editor. Here's how to set it up for ReiLua development:</p>
+<h3>Install Zed</h3>
+<p>Download from: https://zed.dev/</p>
+<h3>Setup Lua Language Support</h3>
+<p>1. Open Zed 2. Press <code>Cmd+Shift+P</code> (Mac) or <code>Ctrl+Shift+P</code> (Windows/Linux) 3. Type "install language server" and select Lua 4. Zed will automatically install the Lua Language Server</p>
+<h3>Configure for ReiLua</h3>
+<p>Create <code>.zed/settings.json</code> in your project root:</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua": {
+          "runtime": {
+            "version": "Lua 5.4"
+          },
+          "diagnostics": {
+            "globals": ["RL"]
+          },
+          "workspace": {
+            "library": ["ReiLua_API.lua"]
+          }
+        }
+      }
+    }
+  },
+  "languages": {
+    "Lua": {
+      "format_on_save": "on",
+      "formatter": "language_server"
+    }
+  }
+}
+</code></pre>
+<h3>Copy ReiLua API Definitions</h3>
+<p>Copy <code>tools/ReiLua_API.lua</code> to your project folder. This provides autocomplete and documentation for all ReiLua functions.</p>
+<pre><code>copy path\to\ReiLua\tools\ReiLua_API.lua your_game\
+</code></pre>
+<h3>Keyboard Shortcuts</h3>
+<p>Useful Zed shortcuts for Lua development:</p>
+<ul>
+<li><code>Ctrl+P</code> / <code>Cmd+P</code> - Quick file search</li>
+<li><code>Ctrl+Shift+F</code> / <code>Cmd+Shift+F</code> - Search in files</li>
+<li><code>Ctrl+.</code> / <code>Cmd+.</code> - Code actions</li>
+<li><code>F12</code> - Go to definition</li>
+<li><code>Shift+F12</code> - Find references</li>
+<li><code>Ctrl+Space</code> - Trigger autocomplete</li>
+</ul>
+<h3>Extensions</h3>
+<p>Install useful extensions: 1. Press <code>Ctrl+Shift+X</code> / <code>Cmd+Shift+X</code> 2. Search and install:</p>
+<ul>
+<li><strong>Lua</strong> - Syntax highlighting and language support</li>
+<li><strong>Better Comments</strong> - Enhanced comment highlighting</li>
+<li><strong>Error Lens</strong> - Inline error display</li>
+</ul>
+<h3>Workspace Setup</h3>
+<p>Create a workspace for ReiLua projects:</p>
+<p>1. Open your game folder in Zed 2. File → Add Folder to Workspace 3. Add the ReiLua source folder (for reference) 4. File → Save Workspace As...</p>
+<p>This lets you easily reference ReiLua source while developing your game.</p>
+<h3>Debugging</h3>
+<p>For debugging Lua code with Zed:</p>
+<p>1. Use <code>print()</code> statements liberally 2. Run ReiLua with <code>--log</code> flag to see output 3. Use <code>RL.TraceLog()</code> for more detailed logging:</p>
+<pre><code>RL.TraceLog(RL.LOG_INFO, "Player position: " .. x .. ", " .. y)
+RL.TraceLog(RL.LOG_WARNING, "Low health!")
+RL.TraceLog(RL.LOG_ERROR, "Failed to load asset!")
+</code></pre>
+<h3>Terminal Integration</h3>
+<p>Run ReiLua directly from Zed's terminal:</p>
+<p>1. Press `<code> Ctrl+</code> `<code> / </code><code> Cmd+</code> `<code> to open terminal 2. Run your game:</p>
+<pre><code>path\to\ReiLua.exe --log --no-logo
+</code></pre>
+<h3>Tips for ReiLua Development in Zed</h3>
+<p>1. <strong>Use Multiple Cursors</strong>: </code>Alt+Click<code> to add cursors, great for batch edits 2. <strong>Split Views</strong>: </code>Ctrl+\<code> to split editor for side-by-side editing 3. <strong>Symbol Search</strong>: </code>Ctrl+T<code> / </code>Cmd+T<code> to search for functions 4. <strong>Zen Mode</strong>: </code>Ctrl+K Z<code> for distraction-free coding 5. <strong>Live Grep</strong>: </code>Ctrl+Shift+F<code> to search across all files</p>
+<h2>Documentation</h2>
+<h3>Comprehensive Guides</h3>
+<ul>
+<li><strong><a href="manual.html">EMBEDDING.md</a></strong> - Complete guide to embedding Lua and assets</li>
+<li><strong><a href="manual.html">ASSET_LOADING.md</a></strong> - Asset loading API and loading screen documentation</li>
+<li><strong><a href="manual.html">SPLASH_SCREENS.md</a></strong> - Splash screen customization guide</li>
+<li><strong><a href="manual.html">BUILD_SCRIPTS.md</a></strong> - Build scripts documentation</li>
+<li><strong><a href="manual.html">API.md</a></strong> - Complete API reference (1000+ functions)</li>
+<li><strong><a href="manual.html">UPGRADE_SUMMARY.md</a></strong> - Technical details of enhancements</li>
+</ul>
+<h3>Quick References</h3>
+<ul>
+<li><strong>docs/API.md</strong> - All ReiLua/Raylib functions</li>
+<li><strong>tools/ReiLua_API.lua</strong> - Lua annotations for IDE autocomplete</li>
+<li><strong>examples/</strong> - Example games and demos</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<p>Game doesn't start:</p>
+<ul>
+<li>Run with </code>--log<code> to see error messages</li>
+<li>Check that </code>main.lua<code> exists</li>
+<li>Verify all required assets exist</li>
+</ul>
+<p>Assets not loading:</p>
+<ul>
+<li>Check file paths (use forward slashes or escaped backslashes)</li>
+<li>Verify files exist in the correct location</li>
+<li>Use </code>--log<code> to see loading errors</li>
+</ul>
+<p>Splash screens don't show:</p>
+<ul>
+<li>Check you're not using </code>--no-logo<code> flag</li>
+<li>Verify build completed successfully</li>
+<li>Rebuild project: </code>cmake --build . --config Release<code></li>
+</ul>
+<p>Lua files not embedded:</p>
+<ul>
+<li>Ensure Lua files are in </code>build/<code> directory before building</li>
+<li>Check </code>main.lua<code> exists</li>
+<li>Verify </code>-DEMBED_MAIN=ON<code> was used</li>
+</ul>
+<p>Assets not embedded:</p>
+<ul>
+<li>Create </code>build/assets/<code> folder</li>
+<li>Copy assets before building</li>
+<li>Verify </code>-DEMBED_ASSETS=ON<code> was used</li>
+</ul>
+<p>Build fails:</p>
+<ul>
+<li>Check CMake and compiler are installed and in PATH</li>
+<li>Verify </code>libraylib.a<code> and </code>liblua.a<code> are in </code>lib/<code> folder</li>
+<li>Try clean build: </code>scripts\build_dev.bat clean<code></li>
+</ul>
+<h3>Getting Help</h3>
+<p>1. Check documentation files listed above 2. Review the examples in </code>examples/<code> folder 3. Use </code>--log` flag to see detailed error messages 4. Check your file paths and directory structure</p>
+<h2>Contributing</h2>
+<p>Contributions are welcome! This is an enhanced version with additional features. When contributing:</p>
+<p>1. Test thoroughly with both development and release builds 2. Update documentation if adding features 3. Follow existing code style 4. Test on multiple platforms if possible</p>
+<h2>License</h2>
+<p>ReiLua is licensed under the zlib/libpng license. See LICENSE file for details.</p>
+<h3>Third-Party Licenses</h3>
+<ul>
+<li><strong>Raylib</strong> - zlib/libpng license</li>
+<li><strong>Lua</strong> - MIT license</li>
+<li><strong>Oleaguid Font</strong> - Check font documentation for licensing</li>
+</ul>
+<h2>Contact & Links</h2>
+<ul>
+<li><strong>Original ReiLua</strong>: https://github.com/Gamerfiend/ReiLua</li>
+<li><strong>Raylib</strong>: https://github.com/raysan5/raylib</li>
+<li><strong>Lua</strong>: https://www.lua.org/</li>
+</ul>
+<h2>Version Information</h2>
+<ul>
+<li><strong>ReiLua Version</strong>: Based on original ReiLua with enhancements</li>
+<li><strong>Raylib Version</strong>: 5.5</li>
+<li><strong>Lua Version</strong>: 5.4</li>
+</ul>
+<p>---</p>
+<p>Happy Game Development!</p>
+<hr>
+<h2 id="embedding">Embedding</h2>
+<h1>Embedding main.lua into Executable</h1>
+<p>When you're ready to ship your game, you can embed all Lua files and asset files directly into the executable.</p>
+<h2>Development vs Release Workflow</h2>
+<p>Development Build (Fast Iteration)</p>
+<p>During development, use external files for quick iteration.</p>
+<p>Setup:</p>
+<pre><code>GameFolder/
+├── ReiLua.exe
+├── main.lua
+├── player.lua
+└── assets/
+    ├── player.png
+    └── music.wav
+</code></pre>
+<p>Build:</p>
+<pre><code>cd build
+cmake ..
+cmake --build .
+</code></pre>
+<p>Benefits:</p>
+<ul>
+<li>Edit Lua files and re-run immediately</li>
+<li>Edit assets and reload</li>
+<li>Fast development cycle</li>
+<li>Debug with <code>--log</code> flag</li>
+</ul>
+<p>Release Build (Single Executable)</p>
+<p>For distribution, embed everything into one file.</p>
+<p>Setup:</p>
+<pre><code>cd build
+
+# Copy Lua files to build directory
+copy ..\main.lua .
+copy ..\player.lua .
+
+# Create assets folder and copy files
+mkdir assets
+copy ..\player.png assets\
+copy ..\music.wav assets\
+</code></pre>
+<p>Build:</p>
+<pre><code># Configure with embedding
+cmake .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON
+
+# Build release
+cmake --build . --config Release
+</code></pre>
+<p>Result:</p>
+<pre><code>Distribution/
+└── YourGame.exe  (Everything embedded!)
+</code></pre>
+<p>Benefits:</p>
+<ul>
+<li>Single executable file</li>
+<li>No external dependencies</li>
+<li>Users can't modify game files</li>
+<li>Smaller download (no separate files)</li>
+</ul>
+<h2>Quick Start</h2>
+<h3>Embedding Lua Files</h3>
+<p>1. <strong>Copy your Lua files to the build directory</strong>:</p>
+   <pre><code>   copy main.lua build\main.lua
+   copy player.lua build\player.lua
+   </code></pre>
+<p>2. <strong>Build with EMBED_MAIN option</strong>:</p>
+   <pre><code>   cd build
+   cmake .. -DEMBED_MAIN=ON
+   cmake --build . --config Release
+   </code></pre>
+<h2>Command Line Options</h2>
+<p>ReiLua supports several command-line options:</p>
+<pre><code>ReiLua [Options] [Directory to main.lua or main]
+
+Options:
+  -h, --help       Show help message
+  -v, --version    Show ReiLua version
+  -i, --interpret  Interpret mode [File name]
+  --log            Show console window for logging (Windows only)
+</code></pre>
+<h3>Console/Logging</h3>
+<p>By default, ReiLua runs <strong>without a console window</strong> for a clean user experience. To enable console output for debugging:</p>
+<pre><code># Run with console for debugging
+ReiLua.exe --log
+
+# You can also combine with other options
+ReiLua.exe --log path/to/game
+
+# Or with interpret mode
+ReiLua.exe --log -i script.lua
+</code></pre>
+<p>This is useful during development to see:</p>
+<ul>
+<li>TraceLog output</li>
+<li>Print statements</li>
+<li>Lua errors</li>
+<li>Debug information</li>
+</ul>
+<h2>Complete Release Workflow</h2>
+<p>Here's a complete step-by-step guide to prepare your game for release:</p>
+<h3>Step 1: Organize Your Project</h3>
+<p>Ensure your project has this structure:</p>
+<pre><code>MyGame/
+├── main.lua
+├── player.lua
+├── enemy.lua
+├── player.png
+├── enemy.png
+├── music.wav
+└── icon.ico (optional)
+</code></pre>
+<h3>Step 2: Customize Branding (Optional)</h3>
+<p>Change executable icon:</p>
+<pre><code># Replace ReiLua's icon with yours
+copy MyGame\icon.ico ReiLua\icon.ico
+</code></pre>
+<p>Edit executable properties: Open <code>ReiLua\resources.rc</code> and modify:</p>
+<pre><code>VALUE "CompanyName", "Your Studio Name"
+VALUE "FileDescription", "Your Game Description"
+VALUE "ProductName", "Your Game Name"
+VALUE "LegalCopyright", "Copyright (C) Your Name, 2025"
+</code></pre>
+<p>Change executable name: Edit <code>ReiLua\CMakeLists.txt</code>:</p>
+<pre><code>project( YourGameName )  # Change from "ReiLua"
+</code></pre>
+<p>See <a href="manual.html">CUSTOMIZATION.md</a> for full details.</p>
+<h3>Important: Asset Paths</h3>
+<strong>Keep your paths consistent!</strong> The embedding system now preserves the <code>assets/</code> prefix, so use the same paths in both development and release:
+<pre><code>--  Correct - works in both dev and release
+playerImage = RL.LoadTexture("assets/player.png")
+backgroundImg = RL.LoadTexture("assets/background.png")
+musicSound = RL.LoadSound("assets/music.wav")
+</code></pre>
+<p>Your Lua code doesn't need to change between development and release builds!</p>
+<h3>Step 3: Prepare Build Directory</h3>
+<pre><code>cd ReiLua\build
+
+# Copy all Lua files
+copy ..\MyGame\*.lua .
+
+# Create assets folder
+mkdir assets
+
+# Copy all asset files (images, sounds, etc.)
+copy ..\MyGame\*.png assets\
+copy ..\MyGame\*.wav assets\
+copy ..\MyGame\*.ogg assets\
+# Or copy entire folders
+xcopy /E /I ..\MyGame\images assets\images
+xcopy /E /I ..\MyGame\sounds assets\sounds
+</code></pre>
+<h3>Step 4: Build Release</h3>
+<pre><code># Configure with embedding enabled
+cmake .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON
+
+# Build in release mode
+cmake --build . --config Release
+</code></pre>
+<h3>Step 5: Test Release Build</h3>
+<pre><code># Test with console to verify everything loaded
+YourGameName.exe --log
+
+# Test production mode (no console)
+YourGameName.exe
+</code></pre>
+<p>Check console output for:</p>
+<ul>
+<li>"ReiLua x.x.x" version info</li>
+<li>No file loading errors</li>
+<li>Game runs correctly</li>
+</ul>
+<h3>Step 6: Package for Distribution</h3>
+<pre><code># Create distribution folder
+mkdir ..\Distribution
+copy YourGameName.exe ..\Distribution\
+
+# Optional: Add README, LICENSE, etc.
+copy ..\README.txt ..\Distribution\
+</code></pre>
+<p>Your game is now ready to distribute as a single executable!</p>
+<h3>Workflow Summary</h3>
+<p>| Stage | Build Command | Files Needed | Result | |-------|--------------|--------------|--------| | <strong>Development</strong> | <code>cmake .. && cmake --build .</code> | Lua + assets external | Fast iteration | | <strong>Testing</strong> | <code>cmake .. -DEMBED_MAIN=ON && cmake --build .</code> | Lua in build/ | Test embedding | | <strong>Release</strong> | <code>cmake .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON && cmake --build . --config Release</code> | Lua + assets in build/ | Single .exe |</p>
+<h3>Troubleshooting</h3>
+<p>Problem: "No .lua files found in build directory"</p>
+<pre><code># Solution: Copy Lua files to build directory
+copy ..\*.lua .
+</code></pre>
+<p>Problem: "No files found in assets folder"</p>
+<pre><code># Solution: Create assets folder and copy files
+mkdir assets
+copy ..\*.png assets\
+</code></pre>
+<p>Problem: Game crashes on startup</p>
+<pre><code># Solution: Run with --log to see error messages
+YourGameName.exe --log
+</code></pre>
+<p>Problem: Assets not loading</p>
+<ul>
+<li>Verify assets are in <code>build/assets/</code> before building</li>
+<li>Check asset filenames match in your Lua code</li>
+<li>Use <code>--log</code> to see loading errors</li>
+</ul>
+<h3>Notes</h3>
+<ul>
+<li><code>.lua</code> files in the <strong>build directory root</strong> are embedded when using <code>EMBED_MAIN=ON</code></li>
+<li>Asset files in <strong>build/assets/</strong> folder (and subfolders) are embedded when using <code>EMBED_ASSETS=ON</code></li>
+<li><code>main.lua</code> must exist and is always the entry point</li>
+<li>Asset embedding works with subdirectories: <code>assets/images/player.png</code> → Load with <code>LoadImage("player.png")</code></li>
+<li>Both Lua and asset embedding can be used independently or together</li>
+<li>The system falls back to file system if embedded file is not found</li>
+<li>No code changes needed - all raylib functions work automatically with embedded assets</li>
+</ul>
+<h2>Customizing Your Executable</h2>
+<p>Want to add your own icon and version info to the executable? See <a href="manual.html">CUSTOMIZATION.md</a> for details on:</p>
+<ul>
+<li>Adding a custom icon</li>
+<li>Setting exe properties (company name, version, description)</li>
+<li>Renaming the executable</li>
+</ul>
+<hr>
+<h2 id="asset-loading">Asset Loading</h2>
+<h1>Asset Loading System</h1>
+<p>ReiLua includes a built-in asset loading system with a loading screen UI that shows progress while assets are being loaded.</p>
+<h2>Features</h2>
+<ul>
+<li>Automatic Progress Tracking - Tracks how many assets have been loaded</li>
+<li>Loading UI with:</li>
+<li>Animated "Loading..." text with dots</li>
+<li>Smooth progress bar with shimmer effect</li>
+<li>Progress percentage (e.g., "3 / 10")</li>
+<li>Current asset name being loaded</li>
+<li>Easy to Use - Just 3 functions to show loading progress</li>
+<li>Works in development and release builds</li>
+</ul>
+<h2>API Functions</h2>
+<h3>RL.BeginAssetLoading(totalAssets)</h3>
+<p>Initialize asset loading progress tracking and show the loading screen.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>totalAssets</code> (integer) - Total number of assets to load</li>
+</ul>
+<p>Example:</p>
+<pre><code>RL.BeginAssetLoading(10)  -- We're loading 10 assets
+</code></pre>
+<p>---</p>
+<h3>RL.UpdateAssetLoading(assetName)</h3>
+<p>Update the loading progress and display current asset being loaded.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>assetName</code> (string) - Name of the asset currently being loaded</li>
+</ul>
+<p>Example:</p>
+<pre><code>RL.UpdateAssetLoading("player.png")
+</code></pre>
+<p>Call this <strong>after</strong> each asset is loaded to update the progress bar.</p>
+<p>---</p>
+<h3>RL.EndAssetLoading()</h3>
+<p>Finish asset loading and hide the loading screen.</p>
+<p>Example:</p>
+<pre><code>RL.EndAssetLoading()
+</code></pre>
+<h2>Quick Example</h2>
+<pre><code>function RL.init()
+    -- List of assets to load
+    local assetsToLoad = {
+        "assets/player.png",
+        "assets/enemy.png", 
+        "assets/background.png",
+        "assets/music.wav",
+    }
+    
+    -- Begin loading
+    RL.BeginAssetLoading(#assetsToLoad)
+    
+    -- Load each asset
+    for i, path in ipairs(assetsToLoad) do
+        RL.UpdateAssetLoading(path)  -- Update progress
+        
+        -- Load the actual asset
+        if path:match("%.png$") or path:match("%.jpg$") then
+            textures[i] = RL.LoadTexture(path)
+        elseif path:match("%.wav$") or path:match("%.ogg$") then
+            sounds[i] = RL.LoadSound(path)
+        end
+    end
+    
+    -- Done!
+    RL.EndAssetLoading()
+end
+</code></pre>
+<h2>Complete Example</h2>
+<pre><code>local assets = {}
+
+local assetsToLoad = {
+    {type="texture", name="player", path="assets/player.png"},
+    {type="texture", name="enemy", path="assets/enemy.png"},
+    {type="texture", name="background", path="assets/background.png"},
+    {type="sound", name="music", path="assets/music.wav"},
+    {type="sound", name="shoot", path="assets/shoot.wav"},
+    {type="font", name="title", path="assets/title.ttf"},
+}
+
+function RL.init()
+    RL.SetWindowTitle("My Game")
+    
+    -- Start loading with progress
+    RL.BeginAssetLoading(#assetsToLoad)
+    
+    -- Load all assets
+    for i, asset in ipairs(assetsToLoad) do
+        -- Show current asset name on loading screen
+        RL.UpdateAssetLoading(asset.name)
+        
+        -- Load based on type
+        if asset.type == "texture" then
+            assets[asset.name] = RL.LoadTexture(asset.path)
+        elseif asset.type == "sound" then
+            assets[asset.name] = RL.LoadSound(asset.path)
+        elseif asset.type == "font" then
+            assets[asset.name] = RL.LoadFont(asset.path)
+        end
+    end
+    
+    -- Loading complete!
+    RL.EndAssetLoading()
+    
+    print("Game ready!")
+end
+
+function RL.update(delta)
+    -- Your game logic
+end
+
+function RL.draw()
+    RL.ClearBackground(RL.RAYWHITE)
+    
+    -- Use loaded assets
+    if assets.background then
+        RL.DrawTexture(assets.background, {0, 0}, RL.WHITE)
+    end
+    
+    if assets.player then
+        RL.DrawTexture(assets.player, {100, 100}, RL.WHITE)
+    end
+end
+</code></pre>
+<h2> Loading Screen Appearance</h2>
+<p>The loading screen features a clean 1-bit pixel art style:</p>
+<p>Design:</p>
+<ul>
+<li>Pure black and white aesthetic</li>
+<li>Retro pixel art styling</li>
+<li>Minimal and clean design</li>
+</ul>
+<p>Elements:</p>
+<ul>
+<li><strong>Title</strong>: "LOADING" in bold white pixel text</li>
+<li><strong>Animated Dots</strong>: White pixelated dots (4x4 squares) that cycle</li>
+<li><strong>Progress Bar</strong>:</li>
+<li>200px wide, 16px tall</li>
+<li>Thick 2px white border (pixel art style)</li>
+<li>White fill with black dithering pattern</li>
+<li>Retro/Classic terminal aesthetic</li>
+<li><strong>Progress Text</strong>: "3/10" in white pixel font style</li>
+<li><strong>Asset Name</strong>: Current loading asset in small white text</li>
+<li><strong>Corner Decorations</strong>: White pixel art L-shaped corners in all 4 corners</li>
+</ul>
+<p>Background:</p>
+<ul>
+<li>Pure black background (#000000)</li>
+<li>High contrast for maximum clarity</li>
+</ul>
+<p>Color Palette:</p>
+<ul>
+<li>White text and UI (#FFFFFF)</li>
+<li>Black background (#000000)</li>
+<li>Pure 1-bit aesthetic (inverted terminal style)</li>
+</ul>
+<p>Style Inspiration:</p>
+<ul>
+<li>Classic terminal / console aesthetic</li>
+<li>MS-DOS loading screens</li>
+<li>1-bit dithering patterns</li>
+<li>Chunky pixel borders</li>
+<li>Retro computing / CRT monitor style</li>
+</ul>
+<h2> Customization</h2>
+<p>If you want to customize the loading screen appearance, you can modify the colors and sizes in <code>src/lua_core.c</code> in the <code>drawLoadingScreen()</code> function.</p>
+<h2> Performance Tips</h2>
+<p>1. <strong>Call UpdateAssetLoading AFTER loading</strong> - This ensures the progress updates at the right time 2. <strong>Load assets in order of importance</strong> - Load critical assets first 3. <strong>Group similar assets</strong> - Load all textures, then sounds, etc. 4. <strong>Use descriptive names</strong> - Shows better feedback to users</p>
+<h2> Example Asset Loading Patterns</h2>
+<h3>Pattern 1: Simple List</h3>
+<pre><code>local files = {"player.png", "enemy.png", "music.wav"}
+RL.BeginAssetLoading(#files)
+for i, file in ipairs(files) do
+    RL.UpdateAssetLoading(file)
+    -- load file
+end
+RL.EndAssetLoading()
+</code></pre>
+<h3>Pattern 2: With Types</h3>
+<pre><code>local assets = {
+    textures = {"player.png", "enemy.png"},
+    sounds = {"music.wav", "shoot.wav"},
+}
+local total = #assets.textures + #assets.sounds
+
+RL.BeginAssetLoading(total)
+for _, file in ipairs(assets.textures) do
+    RL.UpdateAssetLoading(file)
+    -- load texture
+end
+for _, file in ipairs(assets.sounds) do
+    RL.UpdateAssetLoading(file)
+    -- load sound
+end
+RL.EndAssetLoading()
+</code></pre>
+<h3>Pattern 3: Error Handling</h3>
+<pre><code>RL.BeginAssetLoading(#files)
+for i, file in ipairs(files) do
+    RL.UpdateAssetLoading(file)
+    
+    if RL.FileExists(file) then
+        -- load file
+    else
+        print("Warning: " .. file .. " not found")
+    end
+end
+RL.EndAssetLoading()
+</code></pre>
+<h2> When to Use</h2>
+<p>Use the loading system when:</p>
+<ul>
+<li>You have more than 5-10 assets to load</li>
+<li>Assets are large (images, sounds, fonts)</li>
+<li>Loading might take more than 1 second</li>
+<li>You want polished loading feedback</li>
+</ul>
+<p>You can skip it when:</p>
+<ul>
+<li>You have very few, small assets</li>
+<li>Loading is nearly instant</li>
+<li>You prefer immediate game start</li>
+</ul>
+<h2>✨ Benefits</h2>
+<ul>
+<li>Polished user experience</li>
+<li>User knows the game is loading, not frozen</li>
+<li>Shows progress for large asset sets</li>
+<li>Works with embedded assets</li>
+<li>Minimal code required</li>
+<li>Beautiful default UI</li>
+</ul>
+<p>The loading system makes your game feel polished with just a few lines of code!</p>
+<hr>
+<h2 id="splash-screens">Splash Screens</h2>
+<h1>Splash Screens</h1>
+<p>ReiLua includes a built-in splash screen system that displays splash screens before your game loads. This gives your game a polished appearance right from startup.</p>
+<h2>Overview</h2>
+<p>When you run your ReiLua game, it automatically shows two splash screens in sequence:</p>
+<p>1. <strong>Custom Text</strong> - Clean, bold text on Raylib red background (similar to Squid Game style) 2. <strong>"Made using"</strong> - Text with Raylib and ReiLua logos displayed side-by-side</p>
+<p>Each splash screen:</p>
+<ul>
+<li>Fades in over 0.8 seconds</li>
+<li>Displays for 2.5 seconds</li>
+<li>Fades out over 0.8 seconds</li>
+<li>Total display time: 8.2 seconds for both screens</li>
+</ul>
+<h2>Features</h2>
+<h3>Always Embedded</h3>
+<p>The logo images are <strong>always embedded</strong> into the executable in both development and release builds. This means:</p>
+<ul>
+<li>No external logo files needed</li>
+<li>Consistent splash screens across all builds</li>
+<li>No risk of missing logo files</li>
+<li>Clean appearance from the start</li>
+</ul>
+<h3>Asset Loading Integration</h3>
+<p>The splash screens display <strong>before</strong> your game's asset loading begins. This means:</p>
+<p>1. User starts your game 2. Splash screens play (~8 seconds) 3. Your <code>RL.init()</code> function runs 4. Asset loading with progress indicator (if you use it) 5. Your game starts</p>
+<p>This creates a smooth, polished startup experience.</p>
+<h2>Skipping Splash Screens (Development)</h2>
+<p>During development, you often need to test your game repeatedly. Waiting for splash screens every time can slow down your workflow. Use the <code>--no-logo</code> flag to skip them:</p>
+<pre><code># Windows
+ReiLua.exe --no-logo
+
+# Linux/Mac
+./ReiLua --no-logo
+
+# With other options
+ReiLua.exe --log --no-logo
+./ReiLua --no-logo path/to/game/
+</code></pre>
+<strong>Note:</strong> The <code>--no-logo</code> flag only works in development. In release builds, users should see the full splash screen sequence.
+<h2>Technical Details</h2>
+<h3>How It Works</h3>
+<p>The splash screen system is implemented in C and runs before any Lua code executes:</p>
+<p>1. <strong>Logo Embedding</strong>: During build, <code>scripts/embed_logo.py</code> converts PNG files to C byte arrays 2. <strong>Initialization</strong>: Before calling <code>RL.init()</code>, the engine initializes splash screens 3. <strong>Display Loop</strong>: A dedicated loop handles timing, fading, and rendering 4. <strong>Cleanup</strong>: After completion, resources are freed and Lua code begins</p>
+<h3>Files</h3>
+<ul>
+<li><code>src/splash.c</code> - Splash screen implementation</li>
+<li><code>include/splash.h</code> - Header file</li>
+<li><code>scripts/embed_logo.py</code> - Python script to embed logo images</li>
+<li><code>logo/raylib_logo.png</code> - Raylib logo (embedded)</li>
+<li><code>logo/reilua_logo.png</code> - ReiLua logo (embedded)</li>
+</ul>
+<h3>Build Integration</h3>
+<p>The CMakeLists.txt automatically:</p>
+<p>1. Runs <code>scripts/embed_logo.py</code> during build 2. Generates <code>embedded_logo.h</code> with logo data 3. Defines <code>EMBED_LOGO</code> flag 4. Compiles <code>splash.c</code> with the project</p>
+<p>No manual steps required - it just works!</p>
+<h2>Customization</h2>
+<h3>Changing Splash Screen Text</h3>
+<p>To change the default text to your studio name:</p>
+<p>1. Open <code>src/splash.c</code> 2. Find the splash drawing function 3. Change the text line:</p>
+   <pre><code>   const char* text = "YOUR STUDIO NAME";
+   </code></pre>
+<p>4. Rebuild the project</p>
+<strong>Note:</strong> Use ALL CAPS for the Squid Game-style aesthetic.
+<h3>Changing Logos</h3>
+<p>To use different logos:</p>
+<p>1. Replace <code>logo/raylib_logo.png</code> and/or <code>logo/reilua_logo.png</code> with your images 2. Recommended size: 256x256 or smaller (logos are auto-scaled to max 200px) 3. Format: PNG with transparency support 4. Rebuild the project - logos will be automatically embedded</p>
+<h3>Changing Timing</h3>
+<p>To adjust how long each screen displays:</p>
+<p>1. Open <code>src/splash.c</code> 2. Modify these constants at the top:</p>
+   <pre><code>   #define FADE_IN_TIME 0.8f    // Seconds to fade in
+   #define DISPLAY_TIME 2.5f    // Seconds to display fully
+   #define FADE_OUT_TIME 0.8f   // Seconds to fade out
+   </code></pre>
+<p>3. Rebuild the project</p>
+<h3>Removing Splash Screens Entirely</h3>
+<p>If you don't want any splash screens:</p>
+<p>1. Open <code>src/main.c</code> 2. Find this block:</p>
+   <pre><code>   /* Show splash screens if not skipped */
+   if ( !skip_splash ) {
+       splashInit();
+       // ... splash code ...
+       splashCleanup();
+   }
+   </code></pre>
+<p>3. Comment out or remove the entire block 4. Rebuild the project</p>
+<h2>Example: Complete Startup Sequence</h2>
+<p>Here's what a typical game startup looks like with everything enabled:</p>
+<pre><code>ReiLua.exe MyGame/
+</code></pre>
+<p>User Experience: 1. <strong>Splash Screen 1</strong> (4.1 seconds)</p>
+<ul>
+<li>Custom text displayed in bold (default: "YOUR STUDIO NAME")</li>
+<li>Red background (Raylib color #E62937)</li>
+<li>Subtle zoom effect</li>
+</ul>
+<p>2. <strong>Splash Screen 2</strong> (4.1 seconds)</p>
+<ul>
+<li>"Made using" text at top</li>
+<li>Raylib + ReiLua logos side-by-side (max 200px each)</li>
+<li>Black background</li>
+</ul>
+<p>3. <strong>Asset Loading</strong> (varies)</p>
+<ul>
+<li>Your loading screen with progress bar</li>
+<li>Shows "Loading texture1.png", "3/10", etc.</li>
+</ul>
+<p>4. <strong>Game Start</strong></p>
+<ul>
+<li>Your game's main screen appears</li>
+<li>Player can interact</li>
+</ul>
+<h2>Best Practices</h2>
+<p>1. <strong>Keep --no-logo for Development</strong>: Always use <code>--no-logo</code> during active development 2. <strong>Test Without Flag</strong>: Occasionally test without <code>--no-logo</code> to ensure splash screens work 3. <strong>Customize for Your Studio</strong>: Change the text and logos to match your branding 4. <strong>Consider Total Time</strong>: Splash (~8s) + Loading (varies) = Total startup time 5. <strong>Optimize Loading</strong>: Keep asset loading fast to maintain a good first impression</p>
+<h2>Troubleshooting</h2>
+<h3>Splash Screens Don't Show</h3>
+<strong>Problem</strong>: Game starts immediately without splash screens
+<strong>Solutions</strong>:
+<ul>
+<li>Check you're not using <code>--no-logo</code> flag</li>
+<li>Verify logos exist in <code>logo/</code> folder before building</li>
+<li>Check console output for embedding errors</li>
+<li>Rebuild project completely: <code>cmake .. && make clean && make</code></li>
+</ul>
+<h3>Logos Appear Corrupted</h3>
+<strong>Problem</strong>: Logos display incorrectly or not at all
+<strong>Solutions</strong>:
+<ul>
+<li>Verify PNG files are valid (open in image viewer)</li>
+<li>Check file sizes aren't too large (keep under 1MB each)</li>
+<li>Ensure PNGs use standard format (not progressive or exotic encoding)</li>
+<li>Rebuild project to regenerate embedded data</li>
+</ul>
+<h3>Compilation Errors</h3>
+<strong>Problem</strong>: Build fails with logo-related errors
+<strong>Solutions</strong>:
+<ul>
+<li>Ensure Python 3 is installed and in PATH</li>
+<li>Check <code>scripts/embed_logo.py</code> has correct paths</li>
+<li>Verify <code>logo/</code> folder exists with both PNG files</li>
+<li>Check CMake output for specific error messages</li>
+</ul>
+<h2>Command Reference</h2>
+<pre><code># Development (skip splash)
+ReiLua --no-logo
+
+# Development with logging
+ReiLua --log --no-logo
+
+# Production/testing (full splash)
+ReiLua
+
+# Help
+ReiLua --help
+</code></pre>
+<p>---</p>
+<p>The splash screen system adds a polished touch to your ReiLua games with minimal effort. Customize it to match your studio's branding and give players a great first impression!</p>
+<hr>
+<h2 id="build-scripts">Build Scripts</h2>
+<h1>Build Scripts Documentation</h1>
+<p>ReiLua includes automated build scripts for easy development and release builds.</p>
+<h2>Available Scripts</h2>
+<h3>Development Build Scripts</h3>
+<ul>
+<li><strong>Windows</strong>: <code>scripts\build_dev.bat</code></li>
+<li><strong>Linux/Unix</strong>: <code>scripts/build_dev.sh</code></li>
+</ul>
+<h3>Release Build Scripts  </h3>
+<ul>
+<li><strong>Windows</strong>: <code>scripts\build_release.bat</code></li>
+<li><strong>Linux/Unix</strong>: <code>scripts/build_release.sh</code></li>
+</ul>
+<h2>Development Build</h2>
+<h3>Purpose</h3>
+<p>Fast iteration during game development with external Lua files and assets.</p>
+<h3>Usage</h3>
+<p>Windows:</p>
+<pre><code>scripts\build_dev.bat
+</code></pre>
+<p>Linux/Unix:</p>
+<pre><code>chmod +x scripts/build_dev.sh
+scripts/build_dev.sh
+</code></pre>
+<h3>Features</h3>
+<ul>
+<li>No embedding - loads Lua and assets from file system</li>
+<li>Fast build times</li>
+<li>Edit code and assets without rebuilding</li>
+<li>Automatic cleanup of embedded files</li>
+<li>Warns if Lua files or assets are in build directory</li>
+<li>Optional clean build: <code>scripts\build_dev.bat clean</code> or <code>scripts/build_dev.sh clean</code></li>
+</ul>
+<h3>Output</h3>
+<ul>
+<li>Development executable: <code>build/ReiLua.exe</code></li>
+<li>Run your game: <code>cd your_game && path/to/build/ReiLua.exe</code></li>
+<li>Debug mode: <code>path/to/build/ReiLua.exe --log</code></li>
+</ul>
+<h2>Release Build</h2>
+<h3>Purpose</h3>
+<p>Create a single-file executable for distribution with all code and assets embedded.</p>
+<h3>Preparation</h3>
+<p>Before running the release build, prepare your files:</p>
+<pre><code>cd build
+
+# Copy all Lua files
+copy ..\your_game\*.lua .
+# Or: cp ../your_game/*.lua .
+
+# Copy assets
+mkdir assets
+copy ..\your_game\assets\* assets\
+# Or: cp -r ../your_game/assets/* assets/
+</code></pre>
+<h3>Usage</h3>
+<p>Windows:</p>
+<pre><code>scripts\build_release.bat
+</code></pre>
+<p>Linux/Unix:</p>
+<pre><code>chmod +x scripts/build_release.sh
+scripts/build_release.sh
+</code></pre>
+<h3>Features</h3>
+<ul>
+<li>Embeds all Lua files from <code>build/</code> directory</li>
+<li>Embeds all assets from <code>build/assets/</code> folder</li>
+<li>Creates single-file executable</li>
+<li>Release optimization enabled</li>
+<li>Verifies Lua files and assets before building</li>
+<li>Shows summary of embedded files after build</li>
+<li>Interactive confirmation before building</li>
+</ul>
+<h3>Output</h3>
+<ul>
+<li>Release executable: <code>build/ReiLua.exe</code></li>
+<li>Ready for distribution - no external dependencies</li>
+<li>Can be renamed to your game name</li>
+</ul>
+<h3>Build Configuration</h3>
+<p>The release build automatically configures:</p>
+<ul>
+<li><code>EMBED_MAIN=ON</code> - Embeds all Lua files</li>
+<li><code>EMBED_ASSETS=ON</code> - Embeds all assets (if assets folder exists)</li>
+<li><code>CMAKE_BUILD_TYPE=Release</code> - Optimized build</li>
+</ul>
+<h2>Customizing Your Executable</h2>
+<h3>Adding Custom Icon</h3>
+<p>1. Replace <code>icon.ico</code> with your own icon file 2. Keep the same filename or update <code>resources.rc</code> 3. Rebuild</p>
+<h3>Changing Executable Properties</h3>
+<p>Edit <code>resources.rc</code> to customize:</p>
+<pre><code>VALUE "CompanyName", "Your Studio Name"
+VALUE "FileDescription", "Your Game Description"
+VALUE "ProductName", "Your Game Name"
+VALUE "LegalCopyright", "Copyright (C) Your Name, 2025"
+</code></pre>
+<h3>Renaming the Executable</h3>
+<p>Edit <code>CMakeLists.txt</code>:</p>
+<pre><code>project( YourGameName )  # Line 6
+</code></pre>
+<p>After building, the executable will be named <code>YourGameName.exe</code>.</p>
+<h2>Workflow Examples</h2>
+<h3>Development Workflow</h3>
+<pre><code># Initial setup
+scripts\build_dev.bat
+
+# Edit your Lua files in your game directory
+# ... make changes ...
+
+# Just run - no rebuild needed!
+cd your_game
+path\to\build\ReiLua.exe
+
+# If you modify C code, rebuild
+scripts\build_dev.bat
+</code></pre>
+<h3>Release Workflow</h3>
+<pre><code># 1. Prepare files
+cd build
+copy ..\your_game\*.lua .
+mkdir assets
+copy ..\your_game\assets\* assets\
+
+# 2. Build release
+cd ..
+scripts\build_release.bat
+
+# 3. Test
+cd build
+ReiLua.exe --log
+
+# 4. Distribute
+# Copy build\ReiLua.exe to your distribution folder
+</code></pre>
+<h2>Troubleshooting</h2>
+<h3>"CMake configuration failed"</h3>
+<ul>
+<li>Ensure CMake is installed and in PATH</li>
+<li>Ensure MinGW is installed and in PATH</li>
+<li>Check <code>CMakeLists.txt</code> exists in parent directory</li>
+</ul>
+<h3>"No Lua files found"</h3>
+<ul>
+<li>Copy your Lua files to <code>build/</code> directory before release build</li>
+<li>Ensure <code>main.lua</code> exists (required entry point)</li>
+</ul>
+<h3>"Build failed"</h3>
+<ul>
+<li>Check compiler errors in output</li>
+<li>Ensure all dependencies are installed</li>
+<li>Try clean build: <code>scripts\build_dev.bat clean</code></li>
+</ul>
+<h3>Development build embedding warning</h3>
+<ul>
+<li>The dev build script warns if it finds Lua files or assets in build/</li>
+<li>These should be removed for development builds</li>
+<li>The script offers to remove them automatically</li>
+</ul>
+<h2>Script Features</h2>
+<h3>Safety Features</h3>
+<ul>
+<li>Checks for correct directory before running</li>
+<li>Validates required files exist</li>
+<li>Warns about potential issues</li>
+<li>Interactive confirmations for release builds</li>
+<li>Automatic cleanup of old embedded files</li>
+</ul>
+<h3>User Friendly</h3>
+<ul>
+<li>Clear progress messages</li>
+<li>Colored output (where supported)</li>
+<li>Helpful error messages</li>
+<li>Pause at end to review results</li>
+<li>Quick reference commands shown after build</li>
+</ul>
+<h2>Notes</h2>
+<ul>
+<li>Development builds are <strong>much faster</strong> than release builds</li>
+<li>Release builds may take longer due to embedding and optimization</li>
+<li>Always test your release build before distribution</li>
+<li>The scripts work on both Windows (CMD/PowerShell) and Unix shells</li>
+<li>On Unix, make scripts executable: <code>chmod +x build_*.sh</code></li>
+</ul>
+<hr>
+<h2 id="customization">Customization</h2>
+<h1>Customizing Your ReiLua Executable</h1>
+<p>This guide explains how to customize the ReiLua executable with your own branding.</p>
+<h2>Overview</h2>
+<p>You can customize:</p>
+<ul>
+<li>Executable name</li>
+<li>Window icon</li>
+<li>File properties (company name, version, description, etc.)</li>
+<li>Splash screen text and logos</li>
+<li>Loading screen appearance</li>
+</ul>
+<h2>Quick Customization Checklist</h2>
+<ul>
+<li>[ ] Change executable name in CMakeLists.txt</li>
+<li>[ ] Replace icon.ico with your game icon</li>
+<li>[ ] Edit resources.rc with your game information</li>
+<li>[ ] Customize splash screens in src/splash.c</li>
+<li>[ ] Replace logo images in logo/ folder</li>
+<li>[ ] Rebuild the project</li>
+</ul>
+<h2>1. Changing the Executable Name</h2>
+<p>The easiest customization - change "ReiLua.exe" to "YourGame.exe".</p>
+<h3>Steps</h3>
+<p>1. Open <code>CMakeLists.txt</code> 2. Find line 6 (near the top):</p>
+   <pre><code>   project( ReiLua )
+   </code></pre>
+<p>3. Change to your game name:</p>
+   <pre><code>   project( MyAwesomeGame )
+   </code></pre>
+<p>4. Rebuild:</p>
+   <pre><code>   cd build
+   cmake ..
+   cmake --build . --config Release
+   </code></pre>
+<p>Result: Executable is now named <code>MyAwesomeGame.exe</code></p>
+<h2>2. Adding a Custom Icon</h2>
+<p>Replace the default icon with your game's icon.</p>
+<h3>Requirements</h3>
+<ul>
+<li><strong>Format</strong>: .ico file (Windows icon format)</li>
+<li><strong>Recommended sizes</strong>: 16x16, 32x32, 48x48, 256x256</li>
+<li><strong>Tools</strong>: Use online converters or tools like IcoFX, GIMP, or Photoshop</li>
+</ul>
+<h3>Steps</h3>
+<p>1. Create or convert your image to .ico format 2. Replace <code>icon.ico</code> in the ReiLua root folder with your icon 3. Keep the same filename (<code>icon.ico</code>) or update <code>resources.rc</code>:</p>
+   <pre><code>   IDI_ICON1 ICON "your_icon.ico"
+   </code></pre>
+<p>4. Rebuild the project</p>
+<strong>Tip</strong>: Many online tools can convert PNG to ICO:
+<ul>
+<li>https://convertio.co/png-ico/</li>
+<li>https://www.icoconverter.com/</li>
+</ul>
+<h2>3. Customizing Executable Properties</h2>
+<p>When users right-click your .exe and select "Properties", they see file information. Customize this to show your game details.</p>
+<h3>Steps</h3>
+<p>1. Open <code>resources.rc</code> 2. Find the <code>VERSIONINFO</code> section 3. Modify these values:</p>
+<pre><code>1 VERSIONINFO
+FILEVERSION     1,0,0,0      // Change version numbers
+PRODUCTVERSION  1,0,0,0      // Change product version
+FILEFLAGSMASK   0x3fL
+FILEFLAGS       0x0L
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName",      "Your Studio Name"           // Your company/studio
+            VALUE "FileDescription",  "Your Game - An awesome game"  // Game description
+            VALUE "FileVersion",      "1.0.0.0"                    // File version string
+            VALUE "InternalName",     "YourGame"                   // Internal name
+            VALUE "LegalCopyright",   "Copyright (C) 2025 Your Name"  // Copyright notice
+            VALUE "OriginalFilename", "YourGame.exe"               // Original filename
+            VALUE "ProductName",      "Your Game"                  // Product name
+            VALUE "ProductVersion",   "1.0.0.0"                    // Product version string
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+</code></pre>
+<h3>Common Values</h3>
+<strong>FileVersion / ProductVersion Format</strong>: Major, Minor, Patch, Build
+<ul>
+<li>Example: <code>1,0,0,0</code> for version 1.0.0.0</li>
+<li>Example: <code>2,3,1,5</code> for version 2.3.1.5</li>
+</ul>
+<strong>CompanyName Examples</strong>:
+<ul>
+<li>"Your Studio Name"</li>
+<li>"Independent Developer"</li>
+<li>"Your Name Games"</li>
+</ul>
+<strong>FileDescription</strong>:
+<ul>
+<li>Short description users see in file properties</li>
+<li>Example: "Space Adventure Game"</li>
+<li>Example: "Puzzle Game with Physics"</li>
+</ul>
+<strong>LegalCopyright</strong>:
+<ul>
+<li>Standard format: "Copyright (C) Year Your Name"</li>
+<li>Example: "Copyright (C) 2025 Indie Studios"</li>
+</ul>
+<p>4. Rebuild the project</p>
+<h2>4. Customizing Splash Screens</h2>
+<p>Change the text and logos that appear when your game starts.</p>
+<h3>Changing Splash Screen Text</h3>
+<p>1. Open <code>src/splash.c</code> 2. Find the splash drawing function (around line 150) 3. Change this line:</p>
+   <pre><code>   const char* text = "YOUR STUDIO NAME";
+   </code></pre>
+<strong>Style Tips</strong>:
+<ul>
+<li>Use ALL CAPS for bold impact</li>
+<li>Keep it short (under 30 characters)</li>
+<li>Examples: "INDIE STUDIO GAMES", "MADE BY YOUR NAME", "GAME JAM 2025"</li>
+</ul>
+<h3>Changing Splash Screen Logos</h3>
+<p>1. Create or find your logos:</p>
+<ul>
+<li><strong>Recommended size</strong>: 256x256 pixels or smaller</li>
+<li><strong>Format</strong>: PNG with transparency</li>
+<li><strong>Style</strong>: Simple, recognizable logos work best</li>
+</ul>
+<p>2. Replace these files:</p>
+   <pre><code>   logo/raylib_logo.png  → Your game logo
+   logo/reilua_logo.png  → Your studio logo (or keep ReiLua logo as credit)
+   </code></pre>
+<p>3. Logo sizing:</p>
+<ul>
+<li>Logos are automatically scaled to max 200px</li>
+<li>They display side-by-side on second splash screen</li>
+<li>Maintain aspect ratio</li>
+</ul>
+<p>4. Rebuild the project - logos are automatically embedded</p>
+<h3>Changing Splash Screen Timing</h3>
+<p>1. Open <code>src/splash.c</code> 2. Modify these constants at the top:</p>
+   <pre><code>   #define FADE_IN_TIME 0.8f    // Seconds to fade in (default: 0.8)
+   #define DISPLAY_TIME 2.5f    // Seconds fully visible (default: 2.5)
+   #define FADE_OUT_TIME 0.8f   // Seconds to fade out (default: 0.8)
+   </code></pre>
+<strong>Recommendations</strong>:
+<ul>
+<li>Keep fade times between 0.5 - 1.5 seconds</li>
+<li>Display time between 1.5 - 3.5 seconds</li>
+<li>Total splash time ideally under 10 seconds</li>
+</ul>
+<h3>Changing Splash Screen Colors</h3>
+<p>1. Open <code>src/splash.c</code> 2. Find color definitions:</p>
+   <pre><code>   // First splash screen background (Raylib red)
+   Color bgColor = (Color){ 230, 41, 55, 255 };  // Change these RGB values
+   
+   // Second splash screen background (Black)
+   Color bg = BLACK;  // Change to any color
+   </code></pre>
+<strong>Color Examples</strong>:
+<ul>
+<li>White: <code>(Color){ 255, 255, 255, 255 }</code></li>
+<li>Blue: <code>(Color){ 0, 120, 215, 255 }</code></li>
+<li>Dark Gray: <code>(Color){ 32, 32, 32, 255 }</code></li>
+<li>Your brand color: <code>(Color){ R, G, B, 255 }</code></li>
+</ul>
+<h2>5. Customizing the Loading Screen</h2>
+<p>Change the appearance of the asset loading screen.</p>
+<h3>Steps</h3>
+<p>1. Open <code>src/lua_core.c</code> 2. Find the <code>drawLoadingScreen()</code> function 3. Modify colors and style:</p>
+<pre><code>// Background color
+Color bgColor = BLACK;  // Change background
+
+// Text color
+Color textColor = WHITE;  // Change text color
+
+// Progress bar fill color
+Color fillColor = WHITE;  // Change bar fill
+
+// Border color
+Color borderColor = WHITE;  // Change borders
+</code></pre>
+<h3>Customizing Loading Text</h3>
+<pre><code>// In drawLoadingScreen() function
+const char* loadingText = "LOADING";  // Change to "LOADING GAME", etc.
+</code></pre>
+<h3>Changing Progress Bar Size</h3>
+<pre><code>int barWidth = 200;   // Default 200px, change as needed
+int barHeight = 16;   // Default 16px, change as needed
+int borderThick = 2;  // Border thickness
+</code></pre>
+<h2>6. Complete Rebranding Example</h2>
+<p>Here's a complete example of rebranding ReiLua as "Space Quest":</p>
+<h3>1. CMakeLists.txt</h3>
+<pre><code>project( SpaceQuest )
+</code></pre>
+<h3>2. resources.rc</h3>
+<pre><code>VALUE "CompanyName",      "Cosmic Games Studio"
+VALUE "FileDescription",  "Space Quest - Explore the Galaxy"
+VALUE "FileVersion",      "1.0.0.0"
+VALUE "InternalName",     "SpaceQuest"
+VALUE "LegalCopyright",   "Copyright (C) 2025 Cosmic Games"
+VALUE "OriginalFilename", "SpaceQuest.exe"
+VALUE "ProductName",      "Space Quest"
+VALUE "ProductVersion",   "1.0.0.0"
+</code></pre>
+<h3>3. icon.ico</h3>
+<p>Replace with your space-themed icon</p>
+<h3>4. src/splash.c</h3>
+<pre><code>const char* text = "COSMIC GAMES STUDIO";
+</code></pre>
+<h3>5. logo/ folder</h3>
+<pre><code>logo/raylib_logo.png  → Your game logo (space ship, planet, etc.)
+logo/reilua_logo.png  → Studio logo (keep ReiLua logo for credit)
+</code></pre>
+<h3>6. Build</h3>
+<pre><code>cd build
+cmake ..
+cmake --build . --config Release
+</code></pre>
+<p>Result: <code>SpaceQuest.exe</code> with all your custom branding!</p>
+<h2>7. Advanced: Removing ReiLua Branding</h2>
+<p>If you want to completely remove ReiLua references:</p>
+<h3>Remove "Made with ReiLua" Logo</h3>
+<p>1. Open <code>src/splash.c</code> 2. Find <code>drawMadeWithSplash()</code> function 3. Comment out or modify the function to only show your logo</p>
+<h3>Remove Second Splash Screen</h3>
+<p>1. Open <code>src/main.c</code> 2. Find the splash screen loop 3. Modify to only call your custom splash</p>
+<strong>Note</strong>: Please keep attribution to Raylib and ReiLua in your game's credits or about screen as a courtesy!
+<h2>8. Build and Test</h2>
+<p>After making any customizations:</p>
+<pre><code># Clean build (recommended after customizations)
+cd build
+rm -rf *  # Or: rmdir /s /q * on Windows
+cmake ..
+cmake --build . --config Release
+
+# Test with console
+YourGame.exe --log
+
+# Test production mode
+YourGame.exe
+</code></pre>
+<p>Verify:</p>
+<ul>
+<li>Executable has correct name</li>
+<li>Icon appears in file explorer</li>
+<li>Right-click → Properties shows correct info</li>
+<li>Splash screens display correctly</li>
+<li>Loading screen appears as expected</li>
+</ul>
+<h2>Checklist: Release-Ready Customization</h2>
+<p>Before releasing your game:</p>
+<ul>
+<li>[ ] Executable name matches your game</li>
+<li>[ ] Custom icon is recognizable at small sizes</li>
+<li>[ ] File properties are complete and accurate</li>
+<li>[ ] Splash screens show correct studio name</li>
+<li>[ ] Logos are high quality and appropriate size</li>
+<li>[ ] Loading screen matches your game's aesthetic</li>
+<li>[ ] Copyright and legal information is correct</li>
+<li>[ ] Version numbers are accurate</li>
+<li>[ ] Tested on target platforms</li>
+<li>[ ] Credits mention Raylib and ReiLua</li>
+</ul>
+<h2>Tips for Polish</h2>
+<p>1. <strong>Consistent Branding</strong>: Use the same colors, fonts, and style across splash screens, loading screen, and in-game UI</p>
+<p>2. <strong>Icon Quality</strong>: Invest time in a good icon - it's the first thing users see</p>
+<p>3. <strong>Version Management</strong>: Update version numbers for each release</p>
+<p>4. <strong>Legal Info</strong>: Always include proper copyright and attribution</p>
+<p>5. <strong>Test Everything</strong>: Test your branded executable on a clean system</p>
+<p>6. <strong>Keep Credits</strong>: Mention Raylib and ReiLua in your game's credits screen</p>
+<h2>Troubleshooting</h2>
+<p>Icon doesn't change:</p>
+<ul>
+<li>Ensure .ico file is valid</li>
+<li>Rebuild completely (clean build)</li>
+<li>Clear icon cache (Windows): Delete <code>IconCache.db</code></li>
+</ul>
+<p>Properties don't update:</p>
+<ul>
+<li>Verify <code>resources.rc</code> syntax is correct</li>
+<li>Rebuild completely</li>
+<li>Check that resource compiler ran (check build output)</li>
+</ul>
+<p>Splash screens don't show changes:</p>
+<ul>
+<li>Rebuild with clean build</li>
+<li>Check <code>scripts/embed_logo.py</code> ran successfully</li>
+<li>Verify logo files exist in <code>logo/</code> folder</li>
+</ul>
+<p>Executable name unchanged:</p>
+<ul>
+<li>Check <code>CMakeLists.txt</code> project name</li>
+<li>Do a clean rebuild</li>
+<li>Verify cmake configuration step succeeded</li>
+</ul>
+<h2>Additional Resources</h2>
+<h3>Icon Creation Tools</h3>
+<ul>
+<li><strong>IcoFX</strong>: Icon editor (paid)</li>
+<li><strong>GIMP</strong>: Free, supports ICO export</li>
+<li><strong>Online</strong>: convertio.co, icoconverter.com</li>
+</ul>
+<h3>Image Editing</h3>
+<ul>
+<li><strong>GIMP</strong>: Free, powerful image editor</li>
+<li><strong>Paint.NET</strong>: Simple, free Windows editor</li>
+<li><strong>Photoshop</strong>: Industry standard (paid)</li>
+</ul>
+<h3>Color Picking</h3>
+<ul>
+<li><strong>ColorPicker</strong>: Use system color picker</li>
+<li><strong>HTML Color Codes</strong>: htmlcolorcodes.com</li>
+<li><strong>Adobe Color</strong>: color.adobe.com</li>
+</ul>
+<p>---</p>
+<p>Now your ReiLua executable is fully branded and ready to represent your game!</p>
+<hr>
+<h2 id="editor-setup">Editor Setup</h2>
+<h1>Zed Editor Setup for ReiLua</h1>
+<p>This guide explains how to set up autocomplete, type hints, and documentation for ReiLua in Zed Editor.</p>
+<p>---</p>
+<h2>Method 1: Using Lua Language Server (Recommended)</h2>
+<p>Zed uses the <strong>Lua Language Server (LuaLS)</strong> for Lua support. ReiLua includes <code>tools/ReiLua_API.lua</code> with LuaLS annotations.</p>
+<h3>Setup Steps</h3>
+<h4>1. Install Lua Language Server in Zed</h4>
+<p>Zed should automatically install LuaLS when you open a Lua file. If not:</p>
+<p>1. Open Zed 2. Go to <strong>Extensions</strong> (Cmd/Ctrl + Shift + X) 3. Search for "Lua" 4. Install the Lua extension</p>
+<h4>2. Configure Your Project</h4>
+<p>Create a <code>.luarc.json</code> file in your project root:</p>
+<pre><code>{
+  "runtime.version": "Lua 5.4",
+  "workspace.library": [
+    "${3rd}/luassert/library",
+    "${3rd}/busted/library"
+  ],
+  "completion.enable": true,
+  "diagnostics.globals": [
+    "RL"
+  ],
+  "workspace.checkThirdParty": false
+}
+</code></pre>
+<h4>3. Copy tools/ReiLua_API.lua to Your Project</h4>
+<p>Copy <code>tools/ReiLua_API.lua</code> to your game project folder:</p>
+<pre><code># From ReiLua directory
+cp tools/ReiLua_API.lua /path/to/your/game/project/
+</code></pre>
+<p>Or on Windows:</p>
+<pre><code>Copy-Item tools/ReiLua_API.lua "C:\path\to\your\game\project\"
+</code></pre>
+<h4>4. (Optional) Create Library Directory</h4>
+<p>For better organization, create a library directory:</p>
+<pre><code>your-game/
+├── main.lua
+├── .luarc.json
+└── .lua/
+    └── tools/ReiLua_API.lua
+</code></pre>
+<p>Update <code>.luarc.json</code>:</p>
+<pre><code>{
+  "runtime.version": "Lua 5.4",
+  "workspace.library": [".lua"],
+  "completion.enable": true,
+  "diagnostics.globals": ["RL"],
+  "workspace.checkThirdParty": false
+}
+</code></pre>
+<p>---</p>
+<h2>Method 2: Global Configuration (All Projects)</h2>
+<p>To make ReiLua API available for all projects:</p>
+<h3>Windows</h3>
+<p>1. Create directory: <code>%USERPROFILE%\.luarocks\lib\lua\5.4\</code> 2. Copy <code>tools/ReiLua_API.lua</code> to this directory 3. Add to global LuaLS config:</p>
+<strong>Location:</strong> <code>%APPDATA%\Zed\settings.json</code> or via Zed settings
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.workspace.library": [
+          "C:\\Users\\YourName\\.luarocks\\lib\\lua\\5.4"
+        ],
+        "Lua.diagnostics.globals": ["RL"]
+      }
+    }
+  }
+}
+</code></pre>
+<h3>Linux/macOS</h3>
+<p>1. Create directory: <code>~/.lua/reilua/</code> 2. Copy <code>tools/ReiLua_API.lua</code> to this directory 3. Update Zed settings:</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.workspace.library": [
+          "~/.lua/reilua"
+        ],
+        "Lua.diagnostics.globals": ["RL"]
+      }
+    }
+  }
+}
+</code></pre>
+<p>---</p>
+<h2>Method 3: Using Zed's LSP Configuration</h2>
+<p>Create a <code>.zed/settings.json</code> in your project: > Note  There is a sample zed settings json file in the repo root (zed.sample.settings.json)</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.runtime.version": "Lua 5.4",
+        "Lua.workspace.library": [
+          "."
+        ],
+        "Lua.completion.enable": true,
+        "Lua.completion.callSnippet": "Replace",
+        "Lua.completion.displayContext": 3,
+        "Lua.diagnostics.globals": [
+          "RL"
+        ],
+        "Lua.hint.enable": true,
+        "Lua.hint.paramName": "All",
+        "Lua.hint.setType": true
+      }
+    }
+  }
+}
+</code></pre>
+<p>---</p>
+<h2>Verifying Setup</h2>
+<p>Create a test file <code>test.lua</code>:</p>
+<pre><code>function RL.init()
+    -- Type "RL." and you should see autocomplete
+    RL.SetWindowTitle("Test")  -- Should show documentation
+
+    local color = RL.RED  -- Should autocomplete color constants
+
+    -- Hover over functions to see documentation
+    RL.DrawText("Hello", 10, 10, 20, color)
+end
+
+function RL.update(delta)
+    -- 'delta' should show as number type
+end
+</code></pre>
+<p>If autocomplete works, you should see:</p>
+<ul>
+<li>Function suggestions when typing <code>RL.</code></li>
+<li>Parameter hints when calling functions</li>
+<li>Documentation on hover</li>
+<li>Constant values (RL.RED, RL.KEY_SPACE, etc.)</li>
+</ul>
+<p>---</p>
+<h2>Enhanced Features</h2>
+<h3>Enable Inlay Hints</h3>
+<p>In Zed settings:</p>
+<pre><code>{
+  "inlay_hints": {
+    "enabled": true
+  },
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.hint.enable": true,
+        "Lua.hint.paramName": "All",
+        "Lua.hint.setType": true,
+        "Lua.hint.paramType": true
+      }
+    }
+  }
+}
+</code></pre>
+<p>This will show:</p>
+<ul>
+<li>Parameter names inline</li>
+<li>Variable types</li>
+<li>Return types</li>
+</ul>
+<h3>Disable Annoying Warnings</h3>
+<p>Add these to suppress common false positives:</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.diagnostics.disable": [
+          "lowercase-global",
+          "unused-local",
+          "duplicate-set-field",
+          "missing-fields",
+          "undefined-field"
+        ],
+        "Lua.diagnostics.globals": ["RL"]
+      }
+    }
+  }
+}
+</code></pre>
+<p>Common warnings and what they mean:</p>
+<ul>
+<li><code>lowercase-global</code> - Using global variables with lowercase names (RL is intentional)</li>
+<li><code>unused-local</code> - Local variables that aren't used</li>
+<li><code>duplicate-set-field</code> - Redefining functions (callback functions are expected to be redefined)</li>
+<li><code>missing-fields</code> - Table fields that might not exist</li>
+<li><code>undefined-field</code> - Accessing fields that aren't documented</li>
+</ul>
+<p>> <strong>Note:</strong> The <code>tools/ReiLua_API.lua</code> file now uses type annotations instead of function definitions for callbacks to prevent duplicate warnings.</p>
+<p>---</p>
+<h2>Troubleshooting</h2>
+<h3>"duplicate-set-field" Error</h3>
+<strong>Problem:</strong> Getting warnings like <code>Duplicate field 'init'. (Lua Diagnostics. duplicate-set-field)</code>
+<strong>Why:</strong> The <code>tools/ReiLua_API.lua</code> file previously defined callback functions as empty function definitions. When you define them in your <code>main.lua</code>, LSP sees it as redefining the same field.
+<strong>Solution:</strong> The latest <code>tools/ReiLua_API.lua</code> now uses type annotations instead:
+<pre><code>-- Old way (caused warnings)
+function RL.init() end
+
+-- New way (no warnings)
+---@type fun()
+RL.init = nil
+</code></pre>
+<p>Fix Steps: 1. <strong>Update <code>tools/ReiLua_API.lua</code></strong> - Copy the latest version from the repository 2. <strong>Or add to diagnostics.disable</strong> in your configuration:</p>
+   <pre><code>   {
+     "diagnostics.disable": ["duplicate-set-field"]
+   }
+   </code></pre>
+<p>3. <strong>Restart Zed</strong> to reload the configuration</p>
+<p>Benefits of the new approach:</p>
+<ul>
+<li>No duplicate warnings</li>
+<li>Still get autocomplete</li>
+<li>Still get documentation on hover</li>
+<li>Still get type checking</li>
+</ul>
+<p>---</p>
+<h3>Autocomplete Not Working</h3>
+<p>1. <strong>Restart Zed</strong> after configuration changes 2. <strong>Check LSP Status</strong>: Look for Lua Language Server in bottom-right status bar 3. <strong>Verify File Location</strong>: Ensure <code>tools/ReiLua_API.lua</code> is in the workspace 4. <strong>Check Console</strong>: Open Zed's log to see LSP errors</p>
+<h3>Performance Issues</h3>
+<p>If the language server is slow:</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.workspace.maxPreload": 2000,
+        "Lua.workspace.preloadFileSize": 1000
+      }
+    }
+  }
+}
+</code></pre>
+<h3>Missing Documentation</h3>
+<p>Ensure hover is enabled:</p>
+<pre><code>{
+  "hover_popover_enabled": true
+}
+</code></pre>
+<p>---</p>
+<h2>Advanced: Custom Annotations</h2>
+<p>You can extend <code>tools/ReiLua_API.lua</code> with your own game types:</p>
+<pre><code>---@class Player
+---@field x number
+---@field y number
+---@field health number
+
+---@class Enemy
+---@field x number
+---@field y number
+---@field damage number
+
+-- Your game globals
+---@type Player
+player = {}
+
+---@type Enemy[]
+enemies = {}
+</code></pre>
+<p>---</p>
+<h2>Keyboard Shortcuts in Zed</h2>
+<ul>
+<li><strong>Trigger Autocomplete</strong>: <code>Ctrl+Space</code> (Windows/Linux) or <code>Cmd+Space</code> (macOS)</li>
+<li><strong>Show Documentation</strong>: Hover or <code>Ctrl+K Ctrl+I</code></li>
+<li><strong>Go to Definition</strong>: <code>F12</code> or <code>Cmd+Click</code></li>
+<li><strong>Find References</strong>: <code>Shift+F12</code></li>
+<li><strong>Rename Symbol</strong>: <code>F2</code></li>
+</ul>
+<p>---</p>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://github.com/LuaLS/lua-language-server">Lua Language Server GitHub</a></li>
+<li><a href="https://github.com/LuaLS/lua-language-server/wiki/Annotations">LuaLS Annotations Guide</a></li>
+<li><a href="https://zed.dev/docs">Zed Documentation</a></li>
+</ul>
+<p>---</p>
+<h2>Example Project Structure</h2>
+<pre><code>my-reilua-game/
+├── .luarc.json              # LuaLS configuration
+├── .zed/
+│   └── settings.json        # Zed-specific settings
+├── tools/ReiLua_API.lua           # API definitions (copy from ReiLua)
+├── main.lua                 # Your game entry point
+├── player.lua
+├── enemy.lua
+└── assets/
+    ├── sprites/
+    └── sounds/
+</code></pre>
+<p>---</p>
+<h2>Quick Start Template</h2>
+<p>Save this as <code>.luarc.json</code> in your project:</p>
+<pre><code>{
+  "runtime.version": "Lua 5.4",
+  "completion.enable": true,
+  "completion.callSnippet": "Replace",
+  "diagnostics.globals": ["RL"],
+  "diagnostics.disable": [
+    "lowercase-global",
+    "duplicate-set-field",
+    "missing-fields"
+  ],
+  "workspace.checkThirdParty": false,
+  "workspace.library": ["."],
+  "hint.enable": true
+}
+</code></pre>
+<p>Save this as <code>.zed/settings.json</code>:</p>
+<pre><code>{
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.hint.enable": true,
+        "Lua.hint.paramName": "All",
+        "Lua.hint.setType": true,
+        "Lua.diagnostics.disable": [
+          "lowercase-global",
+          "duplicate-set-field",
+          "missing-fields"
+        ]
+      }
+    }
+  },
+  "inlay_hints": {
+    "enabled": true
+  }
+}
+</code></pre>
+<p>Then copy <code>tools/ReiLua_API.lua</code> to your project root, and you're ready to go!</p>
+<p>---</p>
+<p>Happy Coding!</p>
+<hr><div class="footer"><p>ReiLua Enhanced &middot; <a href="https://indrajith.dev">indrajith.dev</a></p></div></div></body></html>

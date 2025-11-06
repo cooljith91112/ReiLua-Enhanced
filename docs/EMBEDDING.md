@@ -4,11 +4,11 @@ When you're ready to ship your game, you can embed all Lua files and asset files
 
 ## Development vs Release Workflow
 
-### 🔧 Development Build (Fast Iteration)
+Development Build (Fast Iteration)
 
-During development, use external files for quick iteration:
+During development, use external files for quick iteration.
 
-**Setup:**
+Setup:
 ```
 GameFolder/
 ├── ReiLua.exe
@@ -19,24 +19,24 @@ GameFolder/
     └── music.wav
 ```
 
-**Build:**
+Build:
 ```bash
 cd build
 cmake ..
 cmake --build .
 ```
 
-**Benefits:**
-- ✅ Edit Lua files and re-run immediately
-- ✅ Edit assets and reload
-- ✅ Fast development cycle
-- ✅ Debug with `--log` flag
+Benefits:
+- Edit Lua files and re-run immediately
+- Edit assets and reload
+- Fast development cycle
+- Debug with `--log` flag
 
-### 📦 Release Build (Single Executable)
+Release Build (Single Executable)
 
-For distribution, embed everything into one file:
+For distribution, embed everything into one file.
 
-**Setup:**
+Setup:
 ```bash
 cd build
 
@@ -50,7 +50,7 @@ copy ..\player.png assets\
 copy ..\music.wav assets\
 ```
 
-**Build:**
+Build:
 ```bash
 # Configure with embedding
 cmake .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON
@@ -59,17 +59,17 @@ cmake .. -DEMBED_MAIN=ON -DEMBED_ASSETS=ON
 cmake --build . --config Release
 ```
 
-**Result:**
+Result:
 ```
 Distribution/
 └── YourGame.exe  (Everything embedded!)
 ```
 
-**Benefits:**
-- ✅ Single executable file
-- ✅ No external dependencies
-- ✅ Users can't modify game files
-- ✅ Smaller download (no separate files)
+Benefits:
+- Single executable file
+- No external dependencies
+- Users can't modify game files
+- Smaller download (no separate files)
 
 ## Quick Start
 
@@ -143,13 +143,13 @@ MyGame/
 
 ### Step 2: Customize Branding (Optional)
 
-**Change executable icon:**
+Change executable icon:
 ```bash
 # Replace ReiLua's icon with yours
 copy MyGame\icon.ico ReiLua\icon.ico
 ```
 
-**Edit executable properties:**
+Edit executable properties:
 Open `ReiLua\resources.rc` and modify:
 ```rc
 VALUE "CompanyName", "Your Studio Name"
@@ -158,7 +158,7 @@ VALUE "ProductName", "Your Game Name"
 VALUE "LegalCopyright", "Copyright (C) Your Name, 2025"
 ```
 
-**Change executable name:**
+Change executable name:
 Edit `ReiLua\CMakeLists.txt`:
 ```cmake
 project( YourGameName )  # Change from "ReiLua"
@@ -171,7 +171,7 @@ See [CUSTOMIZATION.md](CUSTOMIZATION.md) for full details.
 **Keep your paths consistent!** The embedding system now preserves the `assets/` prefix, so use the same paths in both development and release:
 
 ```lua
--- ✅ Correct - works in both dev and release
+--  Correct - works in both dev and release
 playerImage = RL.LoadTexture("assets/player.png")
 backgroundImg = RL.LoadTexture("assets/background.png")
 musicSound = RL.LoadSound("assets/music.wav")
@@ -220,9 +220,9 @@ YourGameName.exe
 ```
 
 Check console output for:
-- ✅ "ReiLua x.x.x" version info
-- ✅ No file loading errors
-- ✅ Game runs correctly
+-  "ReiLua x.x.x" version info
+-  No file loading errors
+-  Game runs correctly
 
 ### Step 6: Package for Distribution
 
@@ -247,26 +247,26 @@ Your game is now ready to distribute as a single executable!
 
 ### Troubleshooting
 
-**Problem: "No .lua files found in build directory"**
+Problem: "No .lua files found in build directory"
 ```bash
 # Solution: Copy Lua files to build directory
 copy ..\*.lua .
 ```
 
-**Problem: "No files found in assets folder"**
+Problem: "No files found in assets folder"
 ```bash
 # Solution: Create assets folder and copy files
 mkdir assets
 copy ..\*.png assets\
 ```
 
-**Problem: Game crashes on startup**
+Problem: Game crashes on startup
 ```bash
 # Solution: Run with --log to see error messages
 YourGameName.exe --log
 ```
 
-**Problem: Assets not loading**
+Problem: Assets not loading
 - Verify assets are in `build/assets/` before building
 - Check asset filenames match in your Lua code
 - Use `--log` to see loading errors

@@ -4,160 +4,115 @@ This document provides a quick reference to all available documentation for ReiL
 
 ## Core Documentation
 
-### 📘 [README.md](README.md) - **START HERE**
-The main documentation covering:
-- What is ReiLua Enhanced Edition
-- Complete attributions (Raylib, ReiLua, enhancements)
-- Quick start guide
-- All enhanced features overview
-- Command line options
-- Building from source (Windows, Linux, Mac, Raspberry Pi, Web)
-- Complete release workflow
-- Troubleshooting
+**README.md** - START HERE
 
-**Read this first!**
+The main documentation covering: what is ReiLua Enhanced Edition, complete attributions (Raylib, ReiLua, enhancements), quick start guide, all enhanced features overview, command line options, building from source (Windows, Linux, Mac, Raspberry Pi, Web), complete release workflow, and troubleshooting.
+
+Read this first!
 
 ---
 
 ## Feature-Specific Guides
 
-### 🎨 [SPLASH_SCREENS.md](SPLASH_SCREENS.md)
-Everything about splash screens:
-- How the dual splash screen system works
-- Custom text splash screen details
-- "Made using Raylib + ReiLua" screen details
-- Skipping splashes with `--no-logo` flag
-- Customizing text, logos, timing, and colors
-- Technical implementation details
-- Troubleshooting splash screen issues
+**SPLASH_SCREENS.md** - Everything about splash screens
 
-### 📦 [EMBEDDING.md](EMBEDDING.md)
-Complete guide to embedding:
-- Development vs release workflows
-- Embedding Lua files (`EMBED_MAIN=ON`)
-- Embedding assets (`EMBED_ASSETS=ON`)
-- Console control with `--log` flag
-- Complete release build workflow
-- Asset path consistency
-- Troubleshooting embedding issues
+How the dual splash screen system works, custom text splash screen details, "Made using Raylib + ReiLua" screen details, skipping splashes with `--no-logo` flag, customizing text, logos, timing, and colors, technical implementation details, and troubleshooting.
 
-### 📊 [ASSET_LOADING.md](ASSET_LOADING.md)
-Asset loading system documentation:
-- API functions (`BeginAssetLoading`, `UpdateAssetLoading`, `EndAssetLoading`)
-- Beautiful 1-bit pixel art loading screen
-- Complete examples
-- Loading patterns
-- Progress tracking
-- When to use the loading system
-- Customization options
+**EMBEDDING.md** - Complete guide to embedding
 
-### 🔧 [BUILD_SCRIPTS.md](BUILD_SCRIPTS.md)
-Build automation documentation:
-- `scripts\build_dev.bat` / `scripts/build_dev.sh` - Development builds
-- `scripts\build_release.bat` / `scripts/build_release.sh` - Release builds
-- Features of each build type
-- Workflow examples
-- Customizing executable name, icon, and properties
-- Troubleshooting build issues
+Development vs release workflows, embedding Lua files (`EMBED_MAIN=ON`), embedding assets (`EMBED_ASSETS=ON`), console control with `--log` flag, complete release build workflow, asset path consistency, and troubleshooting.
 
-### 🎨 [CUSTOMIZATION.md](CUSTOMIZATION.md)
-Complete rebranding guide:
-- Changing executable name
-- Adding custom icon
-- Customizing file properties (company name, version, etc.)
-- Customizing splash screens
-- Customizing loading screen
-- Complete rebranding example
-- Removing ReiLua branding (with attribution notes)
+**ASSET_LOADING.md** - Asset loading system documentation
 
-### 💻 [ZED_EDITOR_SETUP.md](ZED_EDITOR_SETUP.md)
-Complete Zed editor setup:
-- Why Zed for ReiLua development
-- Installation guide
-- Lua Language Server configuration
-- Project setup with `.zed/settings.json`
-- Task configuration for quick testing
-- Essential keyboard shortcuts
-- Multi-cursor editing, split views, Vim mode
-- Troubleshooting LSP issues
-- Workflow tips and best practices
+API functions (`BeginAssetLoading`, `UpdateAssetLoading`, `EndAssetLoading`), beautiful 1-bit pixel art loading screen, complete examples, loading patterns, progress tracking, when to use the loading system, and customization options.
+
+**BUILD_SCRIPTS.md** - Build automation documentation
+
+`scripts\build_dev.bat` / `scripts/build_dev.sh` for development builds, `scripts\build_release.bat` / `scripts/build_release.sh` for release builds, features of each build type, workflow examples, customizing executable name, icon, and properties, and troubleshooting.
+
+**CUSTOMIZATION.md** - Complete rebranding guide
+
+Changing executable name, adding custom icon, customizing file properties (company name, version, etc.), customizing splash screens, customizing loading screen, complete rebranding example, and removing ReiLua branding (with attribution notes).
+
+**ZED_EDITOR_SETUP.md** - Complete Zed editor setup
+
+Why Zed for ReiLua development, installation guide, Lua Language Server configuration, project setup with `.zed/settings.json`, task configuration for quick testing, essential keyboard shortcuts, multi-cursor editing, split views, Vim mode, troubleshooting LSP issues, and workflow tips.
 
 ---
 
 ## Technical Documentation
 
-### 📚 [API.md](API.md)
-Complete API reference:
-- 1000+ functions
-- All ReiLua/Raylib bindings
-- Function signatures
-- Raygui, Raymath, Lights, Easings, RLGL modules
+**API.md** - Complete API reference
 
-### 📝 [tools/ReiLua_API.lua](tools/ReiLua_API.lua)
-Lua annotations file:
-- Provides autocomplete in LSP-enabled editors
-- Function documentation
-- Copy to your project for IDE support
+1000+ functions, all ReiLua/Raylib bindings, function signatures, Raygui, Raymath, Lights, Easings, and RLGL modules.
 
-### 🔄 [UPGRADE_SUMMARY.md](UPGRADE_SUMMARY.md)
-Technical implementation details:
-- Features added in this enhanced version
-- Files modified and added
-- Build options explained
-- Testing checklist
-- Known changes from original ReiLua
+**tools/ReiLua_API.lua** - Lua annotations file
+
+Provides autocomplete in LSP-enabled editors, function documentation. Copy to your project for IDE support.
+
+**UPGRADE_SUMMARY.md** - Technical implementation details
+
+Features added in this enhanced version, files modified and added, build options explained, testing checklist, and known changes from original ReiLua
 
 ---
 
 ## Quick Reference by Task
 
-### "I want to start making a game"
-1. Read [README.md](README.md) - Quick Start section
+I want to start making a game
+
+1. Read README.md - Quick Start section
 2. Look at examples in `examples/` folder
 3. Use `ReiLua.exe --log --no-logo` for development
 
-### "I want to embed my game into a single .exe"
-1. Read [EMBEDDING.md](EMBEDDING.md)
-2. Use `scripts\build_release.bat` / `scripts/build_release.sh`
-3. Follow the complete release workflow in [README.md](README.md)
+I want to embed my game into a single .exe
 
-### "I want to add a loading screen"
-1. Read [ASSET_LOADING.md](ASSET_LOADING.md)
+1. Read EMBEDDING.md
+2. Use `scripts\build_release.bat` / `scripts/build_release.sh`
+3. Follow the complete release workflow in README.md
+
+I want to add a loading screen
+
+1. Read ASSET_LOADING.md
 2. Use `RL.BeginAssetLoading()`, `RL.UpdateAssetLoading()`, `RL.EndAssetLoading()`
 3. See complete examples in the guide
 
-### "I want to customize splash screens"
-1. Read [SPLASH_SCREENS.md](SPLASH_SCREENS.md)
+I want to customize splash screens
+
+1. Read SPLASH_SCREENS.md
 2. Edit `src/splash.c` for text changes
 3. Replace logo files in `logo/` folder
 4. Rebuild project
 
-### "I want to rebrand the executable"
-1. Read [CUSTOMIZATION.md](CUSTOMIZATION.md)
+I want to rebrand the executable
+
+1. Read CUSTOMIZATION.md
 2. Change project name in `CMakeLists.txt`
 3. Replace `icon.ico`
 4. Edit `resources.rc`
 5. Customize splash screens
 6. Rebuild
 
-### "I want to setup my code editor"
-1. Read [ZED_EDITOR_SETUP.md](ZED_EDITOR_SETUP.md)
+I want to setup my code editor
+
+1. Read ZED_EDITOR_SETUP.md
 2. Install Zed and Lua Language Server
 3. Copy `tools/ReiLua_API.lua` to your project
 4. Create `.zed/settings.json` configuration
 5. Set up tasks for quick testing
 
-### "I want to build ReiLua from source"
-1. Read [README.md](README.md) - Building from Source section
+I want to build ReiLua from source
+
+1. Read README.md - Building from Source section
 2. Install prerequisites (CMake, compiler, Raylib, Lua)
 3. Use `scripts\build_dev.bat` for development
 4. Use `scripts\build_release.bat` for release
 
-### "I need API reference"
-1. Open [API.md](API.md)
+I need API reference
+
+1. Open API.md
 2. Search for function name
 3. See function signature and description
-4. Or copy [tools/ReiLua_API.lua](tools/ReiLua_API.lua) for autocomplete
+4. Or copy tools/ReiLua_API.lua for autocomplete
 
 ---
 
@@ -190,22 +145,21 @@ When adding new features, please:
 ## Documentation Standards
 
 All documentation follows these standards:
-- ✅ Clear headings and structure
-- ✅ Code examples for all features
-- ✅ Troubleshooting sections
-- ✅ Cross-references to related docs
-- ✅ Platform-specific notes where needed
-- ✅ Emoji icons for visual scanning
-- ✅ Complete but concise
+- Clear headings and structure
+- Code examples for all features
+- Troubleshooting sections
+- Cross-references to related docs
+- Platform-specific notes where needed
+- Complete but concise
 
 ---
 
 ## Quick Links
 
-- **Original ReiLua**: https://github.com/Gamerfiend/ReiLua
-- **Raylib**: https://github.com/raysan5/raylib
-- **Lua**: https://www.lua.org/
-- **Zed Editor**: https://zed.dev/
+- Original ReiLua: https://github.com/Gamerfiend/ReiLua
+- Raylib: https://github.com/raysan5/raylib
+- Lua: https://www.lua.org/
+- Zed Editor: https://zed.dev/
 
 ---
 

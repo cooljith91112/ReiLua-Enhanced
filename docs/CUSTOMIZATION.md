@@ -322,11 +322,11 @@ YourGame.exe
 ```
 
 Verify:
-- ✅ Executable has correct name
-- ✅ Icon appears in file explorer
-- ✅ Right-click → Properties shows correct info
-- ✅ Splash screens display correctly
-- ✅ Loading screen appears as expected
+-  Executable has correct name
+-  Icon appears in file explorer
+-  Right-click → Properties shows correct info
+-  Splash screens display correctly
+-  Loading screen appears as expected
 
 ## Checklist: Release-Ready Customization
 
@@ -359,22 +359,22 @@ Before releasing your game:
 
 ## Troubleshooting
 
-**Icon doesn't change:**
+Icon doesn't change:
 - Ensure .ico file is valid
 - Rebuild completely (clean build)
 - Clear icon cache (Windows): Delete `IconCache.db`
 
-**Properties don't update:**
+Properties don't update:
 - Verify `resources.rc` syntax is correct
 - Rebuild completely
 - Check that resource compiler ran (check build output)
 
-**Splash screens don't show changes:**
+Splash screens don't show changes:
 - Rebuild with clean build
 - Check `scripts/embed_logo.py` ran successfully
 - Verify logo files exist in `logo/` folder
 
-**Executable name unchanged:**
+Executable name unchanged:
 - Check `CMakeLists.txt` project name
 - Do a clean rebuild
 - Verify cmake configuration step succeeded

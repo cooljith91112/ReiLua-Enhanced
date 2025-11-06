@@ -91,7 +91,7 @@ Successfully ported embedded assets, splash screens, and asset loading features 
 
 ### Quick Build (Recommended)
 
-**Development (Fast Iteration):**
+Development (Fast Iteration):
 ```bash
 # Windows
 scripts\build_dev.bat
@@ -100,7 +100,7 @@ scripts\build_dev.bat
 scripts/build_dev.sh
 ```
 
-**Release (Single Executable):**
+Release (Single Executable):
 ```bash
 # Copy files to build directory first
 cd build
@@ -120,7 +120,7 @@ scripts/build_release.sh
 
 ### Manual Build
 
-**Development Build (Fast Iteration):**
+Development Build (Fast Iteration):
 ```bash
 cmake -G "MinGW Makefiles" ..
 mingw32-make
@@ -129,7 +129,7 @@ mingw32-make
 - Fast edit-and-run workflow
 - Use `--no-logo` to skip splash screens
 
-**Release Build (Single Executable):**
+Release Build (Single Executable):
 ```bash
 # Copy Lua files and assets to build directory
 copy ..\*.lua .
@@ -157,14 +157,14 @@ Options:
 ```
 
 ## Testing
-✅ Build compiles successfully
-✅ Logos and font embedded automatically
-✅ Asset loading API functions registered
-✅ Splash screens implemented and working
-✅ Console control working (Windows)
-✅ Documentation complete
-✅ SEGV crash fixed - window initializes before splash screens
-✅ Runs successfully with and without --no-logo flag
+ Build compiles successfully
+ Logos and font embedded automatically
+ Asset loading API functions registered
+ Splash screens implemented and working
+ Console control working (Windows)
+ Documentation complete
+ SEGV crash fixed - window initializes before splash screens
+ Runs successfully with and without --no-logo flag
 
 ## Known Changes from Original ReiLua
 - `RL.config()` callback removed - window now initializes automatically

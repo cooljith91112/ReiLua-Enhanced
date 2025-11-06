@@ -1,0 +1,15 @@
+<!DOCTYPE HTML><html><head><title>ReiLua</title>
+<link rel="stylesheet" href="style.css"><meta charset="utf-8"></head><body>
+<div class="container"><div class="navigation">
+<a href="index.html">home</a> &middot; <a href="manual.html">manual</a> &middot; <a href="reference.html">reference</a>
+</div><h1>ReiLua Enhanced</h1><p>Lua binding for Raylib.</p><h2>Documentation</h2><ul><li><a href="manual.html">Manual</a></li><li><a href="reference.html">API Reference</a></li></ul><h2>Quick Start</h2><p>Create <code>main.lua</code>:</p><pre><code>function RL.init()
+  RL.SetWindowTitle("Hello")
+end
+
+function RL.update(dt)
+end
+
+function RL.draw()
+  RL.ClearBackground(RL.RAYWHITE)
+  RL.DrawText("Hello!",190,200,20,RL.BLACK)
+end</code></pre><p>Run: <code>ReiLua.exe</code></p><div class="footer"><p>ReiLua Enhanced &middot; <a href="https://indrajith.dev">indrajith.dev</a></p></div></div></body></html>

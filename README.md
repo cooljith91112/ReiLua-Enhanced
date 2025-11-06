@@ -7,18 +7,18 @@
 ## About This Version
 
 This is an enhanced version of ReiLua featuring:
-- 🎮 **Embedded Lua Support** - Bundle all your Lua code into a single executable
-- 📦 **Embedded Assets** - Package images, sounds, and other assets into your game
-- 🎨 **Splash Screens** - Customizable startup screens featuring Raylib and ReiLua
-- 📊 **Asset Loading System** - Beautiful loading screen with progress tracking
-- 🔧 **Automated Build Scripts** - One-command development and release builds
-- 🪟 **Console Control** - Debug logging system for development
+- **Embedded Lua Support** - Bundle all your Lua code into a single executable
+- **Embedded Assets** - Package images, sounds, and other assets into your game
+- **Splash Screens** - Customizable startup screens featuring Raylib and ReiLua
+- **Asset Loading System** - Loading screen with progress tracking
+- **Automated Build Scripts** - One-command development and release builds
+- **Console Control** - Debug logging system for development
 
 ## What is ReiLua?
 
 ReiLua brings the power and simplicity of Raylib to the beginner-friendly Lua language in a straightforward manner. It is a loose binding to Raylib - some functions are excluded and some are added. The concept of pointing to a "main.lua" file and accessing functions "init", "update", and "draw" is borrowed from the Löve game framework.
 
-**Note:** ReiLua is lovingly :heart: handcrafted and will likely contain bugs and documentation errors, so it would be much appreciated if you would report any such findings.
+**Note:** ReiLua is lovingly  handcrafted and will likely contain bugs and documentation errors, so it would be much appreciated if you would report any such findings.
 
 **Reilua** means "fair" in Finnish.
 
@@ -81,7 +81,8 @@ List of some MISSING features that are planned to be included:
 
 ### For Game Developers
 
-**Development Mode (Fast Iteration):**
+Development Mode (Fast Iteration):
+
 ```bash
 # 1. Create your game files
 GameFolder/
@@ -104,7 +105,8 @@ ReiLua.exe --no-logo
 ReiLua.exe --log --no-logo
 ```
 
-**Release Mode (Single Executable):**
+Release Mode (Single Executable):
+
 ```bash
 # See "Building for Release" section below
 ```
@@ -175,12 +177,12 @@ This version includes customizable splash screens that display at startup:
 
 Each screen fades in (0.8s), displays (2.5s), and fades out (0.8s) for a total of ~8 seconds.
 
-**Skip During Development:**
+Skip During Development:
 ```bash
 ReiLua.exe --no-logo
 ```
 
-**Customize:**
+Customize:
 - Change text in `src/splash.c`
 - Replace logos in `logo/` folder
 - Adjust timing with constants in `src/splash.c`
@@ -221,7 +223,7 @@ function RL.init()
 end
 ```
 
-**Features:**
+Features:
 - Retro 1-bit pixel art aesthetic
 - Animated loading text with dots
 - Progress bar with dithering pattern
@@ -294,7 +296,7 @@ This shows:
 
 One-command builds for development and release:
 
-**Development Build (Fast Iteration):**
+Development Build (Fast Iteration):
 ```bash
 # Windows
 scripts\build_dev.bat
@@ -307,7 +309,7 @@ scripts/build_dev.sh
 - Fast build times
 - Edit code without rebuilding
 
-**Release Build (Distribution):**
+Release Build (Distribution):
 ```bash
 # Prepare files first
 cd build
@@ -453,13 +455,13 @@ copy liblua.a path\to\ReiLua\lib\
 
 #### 4. Build ReiLua
 
-**Quick Method (Recommended):**
+Quick Method (Recommended):
 ```bash
 cd ReiLua
 scripts\build_dev.bat
 ```
 
-**Manual Method:**
+Manual Method:
 ```bash
 cd ReiLua\build
 cmake -G "MinGW Makefiles" ..
@@ -491,14 +493,14 @@ Move both `.a` files to the `ReiLua/lib` folder.
 
 #### 3. Build ReiLua
 
-**Quick Method (Recommended):**
+Quick Method (Recommended):
 ```bash
 cd ReiLua
 chmod +x scripts/build_dev.sh
 scripts/build_dev.sh
 ```
 
-**Manual Method:**
+Manual Method:
 ```bash
 cd ReiLua/build
 cmake ..
@@ -651,9 +653,9 @@ ReiLua.exe --log
 ```
 
 Verify:
-- ✅ No file loading errors
-- ✅ Game runs correctly
-- ✅ All assets load properly
+- No file loading errors
+- Game runs correctly
+- All assets load properly
 
 ### Step 5: Distribute
 
@@ -840,32 +842,32 @@ path\to\ReiLua.exe --log --no-logo
 
 ### Common Issues
 
-**Game doesn't start:**
+Game doesn't start:
 - Run with `--log` to see error messages
 - Check that `main.lua` exists
 - Verify all required assets exist
 
-**Assets not loading:**
+Assets not loading:
 - Check file paths (use forward slashes or escaped backslashes)
 - Verify files exist in the correct location
 - Use `--log` to see loading errors
 
-**Splash screens don't show:**
+Splash screens don't show:
 - Check you're not using `--no-logo` flag
 - Verify build completed successfully
 - Rebuild project: `cmake --build . --config Release`
 
-**Lua files not embedded:**
+Lua files not embedded:
 - Ensure Lua files are in `build/` directory before building
 - Check `main.lua` exists
 - Verify `-DEMBED_MAIN=ON` was used
 
-**Assets not embedded:**
+Assets not embedded:
 - Create `build/assets/` folder
 - Copy assets before building
 - Verify `-DEMBED_ASSETS=ON` was used
 
-**Build fails:**
+Build fails:
 - Check CMake and compiler are installed and in PATH
 - Verify `libraylib.a` and `liblua.a` are in `lib/` folder
 - Try clean build: `scripts\build_dev.bat clean`
@@ -910,4 +912,4 @@ ReiLua is licensed under the zlib/libpng license. See LICENSE file for details.
 
 ---
 
-**Happy Game Development! 🎮**
+Happy Game Development!

@@ -19,24 +19,24 @@ Fast iteration during game development with external Lua files and assets.
 
 ### Usage
 
-**Windows:**
+Windows:
 ```cmd
 scripts\build_dev.bat
 ```
 
-**Linux/Unix:**
+Linux/Unix:
 ```bash
 chmod +x scripts/build_dev.sh
 scripts/build_dev.sh
 ```
 
 ### Features
-- ✅ No embedding - loads Lua and assets from file system
-- ✅ Fast build times
-- ✅ Edit code and assets without rebuilding
-- ✅ Automatic cleanup of embedded files
-- ✅ Warns if Lua files or assets are in build directory
-- ✅ Optional clean build: `scripts\build_dev.bat clean` or `scripts/build_dev.sh clean`
+- No embedding - loads Lua and assets from file system
+- Fast build times
+- Edit code and assets without rebuilding
+- Automatic cleanup of embedded files
+- Warns if Lua files or assets are in build directory
+- Optional clean build: `scripts\build_dev.bat clean` or `scripts/build_dev.sh clean`
 
 ### Output
 - Development executable: `build/ReiLua.exe`
@@ -67,25 +67,25 @@ copy ..\your_game\assets\* assets\
 
 ### Usage
 
-**Windows:**
+Windows:
 ```cmd
 scripts\build_release.bat
 ```
 
-**Linux/Unix:**
+Linux/Unix:
 ```bash
 chmod +x scripts/build_release.sh
 scripts/build_release.sh
 ```
 
 ### Features
-- ✅ Embeds all Lua files from `build/` directory
-- ✅ Embeds all assets from `build/assets/` folder
-- ✅ Creates single-file executable
-- ✅ Release optimization enabled
-- ✅ Verifies Lua files and assets before building
-- ✅ Shows summary of embedded files after build
-- ✅ Interactive confirmation before building
+- Embeds all Lua files from `build/` directory
+- Embeds all assets from `build/assets/` folder
+- Creates single-file executable
+- Release optimization enabled
+- Verifies Lua files and assets before building
+- Shows summary of embedded files after build
+- Interactive confirmation before building
 
 ### Output
 - Release executable: `build/ReiLua.exe`
