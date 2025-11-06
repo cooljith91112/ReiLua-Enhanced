@@ -21,10 +21,10 @@ Each splash screen:
 
 The logo images are **always embedded** into the executable in both development and release builds. This means:
 
-- ✅ No external logo files needed
-- ✅ Consistent splash screens across all builds
-- ✅ No risk of missing logo files
-- ✅ Clean appearance from the start
+-  No external logo files needed
+-  Consistent splash screens across all builds
+-  No risk of missing logo files
+-  Clean appearance from the start
 
 ### Asset Loading Integration
 
@@ -149,8 +149,7 @@ Here's what a typical game startup looks like with everything enabled:
 ReiLua.exe MyGame/
 ```
 
-**User Experience:**
-
+User Experience:
 1. **Splash Screen 1** (4.1 seconds)
    - Custom text displayed in bold (default: "YOUR STUDIO NAME")
    - Red background (Raylib color #E62937)

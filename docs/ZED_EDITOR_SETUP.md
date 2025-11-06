@@ -178,10 +178,10 @@ end
 ```
 
 If autocomplete works, you should see:
-- ✅ Function suggestions when typing `RL.`
-- ✅ Parameter hints when calling functions
-- ✅ Documentation on hover
-- ✅ Constant values (RL.RED, RL.KEY_SPACE, etc.)
+-  Function suggestions when typing `RL.`
+-  Parameter hints when calling functions
+-  Documentation on hover
+-  Constant values (RL.RED, RL.KEY_SPACE, etc.)
 
 ---
 
@@ -237,7 +237,7 @@ Add these to suppress common false positives:
 }
 ```
 
-**Common warnings and what they mean:**
+Common warnings and what they mean:
 - `lowercase-global` - Using global variables with lowercase names (RL is intentional)
 - `unused-local` - Local variables that aren't used
 - `duplicate-set-field` - Redefining functions (callback functions are expected to be redefined)
@@ -267,7 +267,7 @@ function RL.init() end
 RL.init = nil
 ```
 
-**Fix Steps:**
+Fix Steps:
 1. **Update `tools/ReiLua_API.lua`** - Copy the latest version from the repository
 2. **Or add to diagnostics.disable** in your configuration:
    ```json
@@ -277,11 +277,11 @@ RL.init = nil
    ```
 3. **Restart Zed** to reload the configuration
 
-**Benefits of the new approach:**
-- ✅ No duplicate warnings
-- ✅ Still get autocomplete
-- ✅ Still get documentation on hover
-- ✅ Still get type checking
+Benefits of the new approach:
+-  No duplicate warnings
+-  Still get autocomplete
+-  Still get documentation on hover
+-  Still get type checking
 
 ---
 
@@ -431,4 +431,4 @@ Then copy `tools/ReiLua_API.lua` to your project root, and you're ready to go!
 
 ---
 
-**Happy Coding! 🚀**
+Happy Coding! 

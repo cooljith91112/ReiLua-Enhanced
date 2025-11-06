@@ -1,29 +1,28 @@
 # Asset Loading System
 
-ReiLua includes a built-in asset loading system with a nice loading screen UI that automatically shows progress while assets are being loaded.
+ReiLua includes a built-in asset loading system with a loading screen UI that shows progress while assets are being loaded.
 
-## 🎨 Features
+## Features
 
-- **Automatic Progress Tracking** - Tracks how many assets have been loaded
-- **Beautiful Loading UI** - Modern, minimal loading screen with:
+- Automatic Progress Tracking - Tracks how many assets have been loaded
+- Loading UI with:
   - Animated "Loading..." text with dots
   - Smooth progress bar with shimmer effect
   - Progress percentage (e.g., "3 / 10")
   - Current asset name being loaded
-  - Dark, clean color scheme
-- **Easy to Use** - Just 3 functions to show loading progress
-- **Works Everywhere** - Development and release builds
+- Easy to Use - Just 3 functions to show loading progress
+- Works in development and release builds
 
-## 📝 API Functions
+## API Functions
 
 ### RL.BeginAssetLoading(totalAssets)
 
 Initialize asset loading progress tracking and show the loading screen.
 
-**Parameters:**
+Parameters:
 - `totalAssets` (integer) - Total number of assets to load
 
-**Example:**
+Example:
 ```lua
 RL.BeginAssetLoading(10)  -- We're loading 10 assets
 ```
@@ -34,10 +33,10 @@ RL.BeginAssetLoading(10)  -- We're loading 10 assets
 
 Update the loading progress and display current asset being loaded.
 
-**Parameters:**
+Parameters:
 - `assetName` (string) - Name of the asset currently being loaded
 
-**Example:**
+Example:
 ```lua
 RL.UpdateAssetLoading("player.png")
 ```
@@ -50,12 +49,12 @@ Call this **after** each asset is loaded to update the progress bar.
 
 Finish asset loading and hide the loading screen.
 
-**Example:**
+Example:
 ```lua
 RL.EndAssetLoading()
 ```
 
-## 🚀 Quick Example
+## Quick Example
 
 ```lua
 function RL.init()
@@ -87,7 +86,7 @@ function RL.init()
 end
 ```
 
-## 💡 Complete Example
+## Complete Example
 
 ```lua
 local assets = {}
@@ -146,16 +145,16 @@ function RL.draw()
 end
 ```
 
-## 🎨 Loading Screen Appearance
+##  Loading Screen Appearance
 
 The loading screen features a clean 1-bit pixel art style:
 
-**Design:**
+Design:
 - Pure black and white aesthetic
 - Retro pixel art styling
 - Minimal and clean design
 
-**Elements:**
+Elements:
 - **Title**: "LOADING" in bold white pixel text
 - **Animated Dots**: White pixelated dots (4x4 squares) that cycle
 - **Progress Bar**: 
@@ -167,52 +166,34 @@ The loading screen features a clean 1-bit pixel art style:
 - **Asset Name**: Current loading asset in small white text
 - **Corner Decorations**: White pixel art L-shaped corners in all 4 corners
 
-**Background:**
+Background:
 - Pure black background (#000000)
 - High contrast for maximum clarity
 
-**Color Palette:**
+Color Palette:
 - White text and UI (#FFFFFF)
 - Black background (#000000)
 - Pure 1-bit aesthetic (inverted terminal style)
 
-**Visual Layout:**
-```
-[Black Background]
-
-┌─┐                                                               ┌─┐
-│ │                         LOADING  □ □                          │ │
-│ │                                                               │ │
-│ │                      ┌──────────────────┐                    │ │
-│ │                      │████████░░░░░░░░░░│    3/10            │ │
-│ │                      └──────────────────┘                    │ │
-│ │                                                               │ │
-│ │                        player.png                            │ │
-│ │                                                               │ │
-└─┘                                                               └─┘
-
-[All text and UI elements in WHITE]
-```
-
-**Style Inspiration:**
+Style Inspiration:
 - Classic terminal / console aesthetic
 - MS-DOS loading screens
 - 1-bit dithering patterns
 - Chunky pixel borders
 - Retro computing / CRT monitor style
 
-## 🔧 Customization
+##  Customization
 
 If you want to customize the loading screen appearance, you can modify the colors and sizes in `src/lua_core.c` in the `drawLoadingScreen()` function.
 
-## ⚡ Performance Tips
+##  Performance Tips
 
 1. **Call UpdateAssetLoading AFTER loading** - This ensures the progress updates at the right time
 2. **Load assets in order of importance** - Load critical assets first
 3. **Group similar assets** - Load all textures, then sounds, etc.
 4. **Use descriptive names** - Shows better feedback to users
 
-## 📋 Example Asset Loading Patterns
+##  Example Asset Loading Patterns
 
 ### Pattern 1: Simple List
 ```lua
@@ -260,26 +241,26 @@ end
 RL.EndAssetLoading()
 ```
 
-## 🎮 When to Use
+##  When to Use
 
-**Use the loading system when:**
+Use the loading system when:
 - You have more than 5-10 assets to load
 - Assets are large (images, sounds, fonts)
 - Loading might take more than 1 second
 - You want polished loading feedback
 
-**You can skip it when:**
+You can skip it when:
 - You have very few, small assets
 - Loading is nearly instant
 - You prefer immediate game start
 
 ## ✨ Benefits
 
-- ✅ Polished user experience
-- ✅ User knows the game is loading, not frozen
-- ✅ Shows progress for large asset sets
-- ✅ Works with embedded assets
-- ✅ Minimal code required
-- ✅ Beautiful default UI
+-  Polished user experience
+-  User knows the game is loading, not frozen
+-  Shows progress for large asset sets
+-  Works with embedded assets
+-  Minimal code required
+-  Beautiful default UI
 
 The loading system makes your game feel polished with just a few lines of code!

@@ -59,6 +59,96 @@ This function will be called when unloading resource that has allocated memory. 
 
 ---
 
+## ReiLua Enhanced Functions
+
+These functions are part of ReiLua Enhanced Edition and provide additional functionality for asset loading and game development.
+
+---
+
+> RL.BeginAssetLoading( int totalAssets )
+
+Initialize asset loading progress tracking and show the loading screen. This displays a beautiful loading UI with progress bar and asset names.
+
+Parameters:
+- `totalAssets` (integer) - Total number of assets to load
+
+Example:
+```lua
+RL.BeginAssetLoading(10)  -- We're loading 10 assets
+```
+
+Features:
+- Shows animated "LOADING..." text with dots
+- Displays progress bar with shimmer effect
+- Shows current asset name being loaded
+- Shows progress counter (e.g., "3 / 10")
+- 1-bit pixel art aesthetic
+
+---
+
+> RL.UpdateAssetLoading( string assetName )
+
+Update loading progress for the current asset. Call this after each asset is loaded to update the progress bar and display.
+
+Parameters:
+- `assetName` (string) - Name of the asset currently being loaded
+
+Example:
+```lua
+RL.UpdateAssetLoading("player.png")
+-- Load the asset here
+playerTexture = RL.LoadTexture("assets/player.png")
+```
+
+Notes:
+- Automatically increments the loaded asset counter
+- Updates the loading screen UI
+- Shows the asset name on screen
+- Updates progress bar percentage
+
+---
+
+> RL.EndAssetLoading()
+
+Finish asset loading and hide the loading screen. Call this after all assets have been loaded.
+
+Example:
+```lua
+RL.EndAssetLoading()
+```
+
+Complete Example:
+```lua
+function RL.init()
+    local assets = {}
+    local assetsToLoad = {
+        "assets/player.png",
+        "assets/enemy.png",
+        "assets/background.png",
+        "assets/music.wav",
+    }
+    
+    -- Begin loading
+    RL.BeginAssetLoading(#assetsToLoad)
+    
+    -- Load each asset
+    for i, path in ipairs(assetsToLoad) do
+        RL.UpdateAssetLoading(path)
+        
+        if path:match("%.png$") then
+            assets[i] = RL.LoadTexture(path)
+        elseif path:match("%.wav$") then
+            assets[i] = RL.LoadSound(path)
+        end
+    end
+    
+    -- Done loading
+    RL.EndAssetLoading()
+end
+```
+
+---
+
 ## Object unloading
 
 Some objects allocate memory that needs to be freed when object is no longer needed. By default objects like Textures are unloaded by the Lua garbage collector. It is generatty however recommended to handle this manually in more complex projects. You can change the behavior with SetGCUnload.
