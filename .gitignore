@@ -1,6 +1,10 @@
 .vscode
 build/
 
+# macOS files
+.DS_Store
+**/.DS_Store
+
 # Projects - ignore all folders inside projects/ except the projects folder itself
 projects/*/
 !projects/README.md
