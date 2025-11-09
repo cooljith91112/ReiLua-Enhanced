@@ -119,7 +119,7 @@ mkdir -p "$PROJECT_DIR"
 echo "Copying ReiLua-Enhanced files..."
 
 # Create directory structure first
-mkdir -p "$PROJECT_DIR"/{src,include,lib,scripts/macos,fonts,logo,cmake}
+mkdir -p "$PROJECT_DIR"/{src,include,lib,scripts/macos,fonts,logo,cmake,game}
 
 # Copy files using find to preserve structure, excluding unnecessary files
 (cd "$SCRIPT_DIR/.." && \
@@ -140,7 +140,7 @@ mkdir -p "$PROJECT_DIR"/{src,include,lib,scripts/macos,fonts,logo,cmake}
     ! -name '*.md' \
     ! -name 'changelog' \
     ! -name 'devnotes' \
-    ! -name '*.png' \
+    ! -name 'logo.png' \
     ! -name 'LICENSE' \
     ! -name 'zed.sample.settings.json' \
     ! -name 'create_project.sh' \
@@ -361,21 +361,24 @@ EOFBUNDLE
 
 # Replace placeholders in create_app_bundle.sh
 if [ -f "$PROJECT_DIR/scripts/macos/create_app_bundle.sh" ]; then
-    # Cross-platform sed: detect OS and use appropriate syntax
+    # Use direct sed replacement for macOS (creates backup with different approach)
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS requires empty string after -i
-        SED_INPLACE="sed -i ''"
+        # macOS sed
+        sed -i '' "s/__PROJECT_NAME__/$PROJECT_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i '' "s/__EXECUTABLE_NAME__/$EXECUTABLE_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i '' "s/__BUNDLE_ID__/$BUNDLE_ID/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i '' "s/__VERSION__/$VERSION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i '' "s/__AUTHOR_NAME__/$AUTHOR_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i '' "s/__DESCRIPTION__/$DESCRIPTION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
     else
         # Linux/Windows Git Bash
-        SED_INPLACE="sed -i"
+        sed -i "s/__PROJECT_NAME__/$PROJECT_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i "s/__EXECUTABLE_NAME__/$EXECUTABLE_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i "s/__BUNDLE_ID__/$BUNDLE_ID/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i "s/__VERSION__/$VERSION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i "s/__AUTHOR_NAME__/$AUTHOR_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
+        sed -i "s/__DESCRIPTION__/$DESCRIPTION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
     fi
-    
-    $SED_INPLACE "s/__PROJECT_NAME__/$PROJECT_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
-    $SED_INPLACE "s/__EXECUTABLE_NAME__/$EXECUTABLE_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
-    $SED_INPLACE "s/__BUNDLE_ID__/$BUNDLE_ID/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
-    $SED_INPLACE "s/__VERSION__/$VERSION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
-    $SED_INPLACE "s/__AUTHOR_NAME__/$AUTHOR_NAME/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
-    $SED_INPLACE "s/__DESCRIPTION__/$DESCRIPTION/g" "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
     chmod +x "$PROJECT_DIR/scripts/macos/create_app_bundle.sh"
 fi
 
@@ -406,62 +409,91 @@ $DESCRIPTION
 - **Created:** $(date +%Y-%m-%d)
 - **Built with:** ReiLua-Enhanced
 
-## Building
-
-### Development Build
-\`\`\`bash
-./scripts/build_dev.sh
-\`\`\`
-
-### Release Build
-\`\`\`bash
-# Copy your Lua files and assets
-mkdir -p build
-cp *.lua build/
-cp -r assets build/
-
-# Build
-./scripts/build_release.sh
-\`\`\`
-
-### macOS App Bundle
-\`\`\`bash
-./scripts/macos/create_app_bundle.sh
-\`\`\`
-
 ## Project Structure
 
 \`\`\`
 $PROJECT_NAME/
-├── main.lua           # Your game entry point
-├── assets/            # Game assets (images, sounds, etc.)
-├── build/             # Build output directory
+├── game/              # Your game files (edit here!)
+│   ├── main.lua       # Game entry point
+│   └── assets/        # Game assets
+├── build/             # Build output (auto-generated)
 ├── scripts/           # Build scripts
-│   ├── build_dev.sh
-│   ├── build_release.sh
-│   └── macos/
-│       ├── build_static_libs.sh
-│       └── create_app_bundle.sh
 ├── src/               # ReiLua C source
 ├── include/           # Headers
 └── lib/               # Static libraries
 \`\`\`
 
+**Important:** All your game development happens in the \`game/\` folder!
+
+## Development Workflow
+
+### 1. Edit Your Game
+
+All your game files go in the \`game/\` folder:
+
+\`\`\`
+game/
+├── main.lua           # Your game code
+├── player.lua         # Game modules
+├── enemy.lua
+└── assets/
+    ├── sprites/
+    │   ├── player.png
+    │   └── enemy.png
+    └── sounds/
+        └── music.wav
+\`\`\`
+
+### 2. Build for Development
+
+\`\`\`bash
+./scripts/build_dev.sh
+\`\`\`
+
+### 3. Run Your Game
+
+From project root, ReiLua will automatically load from \`game/\` folder:
+
+\`\`\`bash
+./build/ReiLua --no-logo --log
+\`\`\`
+
+The engine checks paths in this order:
+1. \`game/main.lua\` (if game folder exists)
+2. \`main.lua\` (current directory)
+3. Embedded files (release builds)
+
+### 4. Release Build
+
+Release build automatically copies from \`game/\` folder:
+
+\`\`\`bash
+./scripts/build_release.sh
+\`\`\`
+
+This will:
+- Copy all \`.lua\` files from \`game/\` to \`build/\`
+- Copy \`game/assets/\` to \`build/assets/\`
+- Embed everything into the executable
+
 ## Game Development
 
-Edit \`main.lua\` and add your game code:
+Edit \`game/main.lua\`:
 
 \`\`\`lua
-function init()
-    -- Initialize your game
+function RL.init()
+    -- Load your assets
+    player = RL.LoadTexture("assets/sprites/player.png")
 end
 
-function update(dt)
+function RL.update(delta)
     -- Update game logic
 end
 
-function draw()
+function RL.draw()
     -- Draw your game
+    RL.ClearBackground(RL.RAYWHITE)
+    RL.DrawTexture(player, 100, 100, RL.WHITE)
 end
 \`\`\`
 
@@ -490,6 +522,24 @@ hdiutil create -volname '$PROJECT_NAME' \\
 # The executable is: build/ReiLua (rename to ${EXECUTABLE_NAME})
 \`\`\`
 
+## Why the game/ Folder?
+
+The \`game/\` folder keeps your work organized and safe:
+
+- **Separation:** Your game files stay separate from build artifacts
+- **Safety:** Rebuilding won't delete your game files
+- **Clarity:** Anyone can see where the game code lives
+- **Automation:** Release builds auto-copy from game/ folder
+
+## Editor Setup
+
+This project includes configurations for:
+- **Lua Language Server** (\`.luarc.json\`) - Autocomplete and type checking
+- **Zed Editor** (\`.zed/settings.json\`) - LSP configuration
+- **Zed Tasks** (\`.zed/tasks.json\`) - Build and run commands
+
+Open the project in Zed and use \`Cmd+Shift+P\` → "Run Task" to build and run.
+
 ## License
 
 Add your license information here.
@@ -500,46 +550,198 @@ Built with [ReiLua-Enhanced](https://github.com/nullstare/ReiLua)
 EOFREADME
 
 # Create example main.lua
-cat > "$PROJECT_DIR/main.lua" << EOFLUA
+cat > "$PROJECT_DIR/game/main.lua" << EOFLUA
 -- $PROJECT_NAME
 -- $DESCRIPTION
 -- Author: $AUTHOR_NAME
 
-function init()
+function RL.init()
+    RL.SetWindowTitle( "$PROJECT_NAME" )
+    RL.SetWindowState( RL.FLAG_VSYNC_HINT )
+    
     print("$PROJECT_NAME initialized!")
     print("Version: $VERSION")
     print("Author: $AUTHOR_NAME")
-    
-    -- Initialize your game here
 end
 
-function update(dt)
-    -- Update game logic here
-    -- dt = delta time in seconds
-end
-
-function draw()
-    -- Draw your game here
-    RL.clearBackground(RL.RAYWHITE)
+function RL.update( delta )
+    -- Game logic goes here
+    -- delta is time since last frame in seconds
     
-    RL.drawText("$PROJECT_NAME", 10, 10, 40, RL.BLACK)
-    RL.drawText("Press ESC to exit", 10, 60, 20, RL.DARKGRAY)
-    
-    if RL.isKeyPressed(RL.KEY_ESCAPE) then
-        RL.closeWindow()
+    if RL.IsKeyPressed( RL.KEY_ESCAPE ) then
+        RL.CloseWindow()
     end
+end
+
+function RL.draw()
+    RL.ClearBackground( RL.RAYWHITE )
+    
+    RL.DrawText( "$PROJECT_NAME", { 10, 10 }, 40, RL.BLACK )
+    RL.DrawText( "Press ESC to exit", { 10, 60 }, 20, RL.DARKGRAY )
 end
 EOFLUA
 
-# Create assets directory
-mkdir -p "$PROJECT_DIR/assets"
-cat > "$PROJECT_DIR/assets/.gitkeep" << EOFKEEP
+# Create assets directory in game folder
+mkdir -p "$PROJECT_DIR/game/assets"
+cat > "$PROJECT_DIR/game/assets/.gitkeep" << EOFKEEP
+# Game assets folder
 # Place your game assets here:
 # - Images (.png, .jpg)
 # - Sounds (.wav, .ogg, .mp3)
 # - Fonts (.ttf)
 # - Other resources
 EOFKEEP
+
+# Copy ReiLua API definitions for LSP to game folder
+echo "Setting up game folder for development..."
+if [ -f "$SCRIPT_DIR/../tools/ReiLua_API.lua" ]; then
+    cp "$SCRIPT_DIR/../tools/ReiLua_API.lua" "$PROJECT_DIR/game/"
+    echo "  ✓ game/ReiLua_API.lua"
+fi
+
+# Create .luarc.json for Lua Language Server in game folder
+cat > "$PROJECT_DIR/game/.luarc.json" << EOFLUARC
+{
+  "runtime.version": "Lua 5.4",
+  "completion.enable": true,
+  "completion.callSnippet": "Replace",
+  "completion.displayContext": 3,
+  "diagnostics.globals": ["RL"],
+  "diagnostics.disable": [
+    "lowercase-global",
+    "unused-local",
+    "duplicate-set-field",
+    "missing-fields",
+    "undefined-field"
+  ],
+  "workspace.checkThirdParty": false,
+  "workspace.library": ["ReiLua_API.lua"],
+  "hint.enable": true,
+  "hint.paramName": "All",
+  "hint.setType": true,
+  "hint.paramType": true
+}
+EOFLUARC
+
+echo "  ✓ game/.luarc.json"
+
+# Create Zed editor configuration in project root
+echo "Setting up Zed editor configuration..."
+mkdir -p "$PROJECT_DIR/.zed"
+mkdir -p "$PROJECT_DIR/scripts/run"
+
+# Create run scripts for tasks (cross-platform)
+cat > "$PROJECT_DIR/scripts/run/run_dev.sh" << 'EOFRUNDEV'
+#!/bin/bash
+cd "$(dirname "$0")/../.."
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/${EXE}.exe --no-logo --log
+else
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/$EXE --no-logo --log
+fi
+EOFRUNDEV
+chmod +x "$PROJECT_DIR/scripts/run/run_dev.sh"
+
+cat > "$PROJECT_DIR/scripts/run/run_no_splash.sh" << 'EOFRUNNOSPLASH'
+#!/bin/bash
+cd "$(dirname "$0")/../.."
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/${EXE}.exe --no-logo
+else
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/$EXE --no-logo
+fi
+EOFRUNNOSPLASH
+chmod +x "$PROJECT_DIR/scripts/run/run_no_splash.sh"
+
+cat > "$PROJECT_DIR/scripts/run/run_release.sh" << 'EOFRUNRELEASE'
+#!/bin/bash
+cd "$(dirname "$0")/../.."
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/${EXE}.exe
+else
+    EXE=$(grep EXECUTABLE_NAME= project.info | cut -d= -f2)
+    ./build/$EXE
+fi
+EOFRUNRELEASE
+chmod +x "$PROJECT_DIR/scripts/run/run_release.sh"
+
+cat > "$PROJECT_DIR/.zed/settings.json" << EOFZED
+{
+  "inlay_hints": {
+    "enabled": true
+  },
+  "lsp": {
+    "lua-language-server": {
+      "settings": {
+        "Lua.runtime.version": "Lua 5.4",
+        "Lua.workspace.library": [
+          "game/ReiLua_API.lua"
+        ],
+        "Lua.completion.enable": true,
+        "Lua.completion.callSnippet": "Replace",
+        "Lua.completion.displayContext": 3,
+        "Lua.diagnostics.globals": [
+          "RL"
+        ],
+        "Lua.hint.enable": true,
+        "Lua.hint.paramName": "All",
+        "Lua.hint.setType": true,
+        "Lua.hint.paramType": true,
+        "Lua.diagnostics.disable": [
+          "lowercase-global",
+          "unused-local",
+          "duplicate-set-field",
+          "missing-fields",
+          "undefined-field"
+        ]
+      }
+    }
+  }
+}
+EOFZED
+
+cat > "$PROJECT_DIR/.zed/tasks.json" << EOFTASKS
+[
+  {
+    "label": "Run Game (Dev)",
+    "command": "./scripts/run/run_dev.sh",
+    "args": [],
+    "use_new_terminal": true
+  },
+  {
+    "label": "Run Game (No Splash)",
+    "command": "./scripts/run/run_no_splash.sh",
+    "args": [],
+    "use_new_terminal": true
+  },
+  {
+    "label": "Run Game (Release)",
+    "command": "./scripts/run/run_release.sh",
+    "args": [],
+    "use_new_terminal": true
+  },
+  {
+    "label": "Build Dev",
+    "command": "./scripts/build_dev.sh",
+    "args": [],
+    "use_new_terminal": true
+  },
+  {
+    "label": "Build Release",
+    "command": "./scripts/build_release.sh",
+    "args": [],
+    "use_new_terminal": true
+  }
+]
+EOFTASKS
+
+echo "  ✓ .zed/settings.json"
+echo "  ✓ .zed/tasks.json"
 
 echo ""
 echo "╔════════════════════════════════════════════════════════════════════╗"
@@ -556,18 +758,22 @@ echo "  Author:     $AUTHOR_NAME"
 echo ""
 echo "Next Steps:"
 echo "  1. cd projects/$PROJECT_NAME"
-echo "  2. Edit main.lua (your game code)"
-echo "  3. Add assets to assets/ folder"
+echo "  2. Edit game/main.lua (your game code)"
+echo "  3. Add assets to game/assets/ folder"
 echo "  4. Build: ./scripts/build_dev.sh"
 echo "  5. Run: ./build/ReiLua"
 echo ""
 echo "Files Created:"
-echo "  ✓ main.lua - Game entry point"
+echo "  ✓ game/main.lua - Game entry point"
+echo "  ✓ game/assets/ - Asset directory"
+echo "  ✓ game/ReiLua_API.lua - API definitions for LSP"
+echo "  ✓ game/.luarc.json - Lua Language Server config"
+echo "  ✓ .zed/settings.json - Zed editor config"
+echo "  ✓ .zed/tasks.json - Build and run tasks"
 echo "  ✓ project.info - Project metadata"
 echo "  ✓ README.md - Project documentation"
 echo "  ✓ resources.rc - Windows metadata (embedded in .exe)"
 echo "  ✓ scripts/macos/create_app_bundle.sh - macOS bundle with metadata"
-echo "  ✓ assets/ - Asset directory"
 echo ""
 echo "Build Scripts Updated:"
 echo "  ✓ Lua path:    ../lua (sibling directory)"

@@ -72,8 +72,38 @@ cd build || exit 1
 echo "Cleaning old embedded files..."
 rm -f embedded_main.h embedded_assets.h
 
-# Check for Lua files
+# Auto-copy from game folder if it exists
 echo ""
+if [ -d "../game" ]; then
+    echo "Found game/ folder - auto-copying contents to build..."
+    
+    # Copy all Lua files from game folder EXCEPT ReiLua_API.lua
+    if ls ../game/*.lua 1> /dev/null 2>&1; then
+        for lua_file in ../game/*.lua; do
+            filename=$(basename "$lua_file")
+            if [ "$filename" != "ReiLua_API.lua" ]; then
+                cp "$lua_file" .
+            fi
+        done
+        LUA_COUNT=$(ls *.lua 2>/dev/null | wc -l)
+        echo "  ✓ Copied $LUA_COUNT Lua file(s)"
+    else
+        echo "  ⚠ No Lua files found in game/"
+    fi
+    
+    # Copy assets folder if it exists
+    if [ -d "../game/assets" ]; then
+        rm -rf assets
+        cp -r ../game/assets .
+        ASSET_COUNT=$(find assets -type f 2>/dev/null | wc -l)
+        echo "  ✓ Copied assets/ ($ASSET_COUNT files)"
+    else
+        echo "  ℹ No assets folder in game/"
+    fi
+    echo ""
+fi
+
+# Check for Lua files
 echo "Checking for Lua files..."
 LUA_FILES=$(ls *.lua 2>/dev/null | wc -l)
 
@@ -81,9 +111,15 @@ if [ "$LUA_FILES" -eq 0 ]; then
     echo ""
     echo "WARNING: No Lua files found in build directory!"
     echo ""
-    echo "Please copy your Lua files:"
-    echo "  cd build"
-    echo "  cp ../your_game/*.lua ."
+    if [ -d "../game" ]; then
+        echo "No Lua files found in game/ folder either."
+        echo "Add your main.lua to game/ folder and try again."
+    else
+        echo "Tip: Create a game/ folder in project root and add main.lua there."
+        echo "Or manually copy files:"
+        echo "  cd build"
+        echo "  cp ../your_game/*.lua ."
+    fi
     echo ""
     read -p "Do you want to continue anyway? (y/N): " -n 1 -r
     echo ""
@@ -102,10 +138,16 @@ if [ ! -d "assets" ]; then
     echo ""
     echo "WARNING: No assets folder found!"
     echo ""
-    echo "To embed assets, create the folder and copy files:"
-    echo "  cd build"
-    echo "  mkdir assets"
-    echo "  cp ../your_game/assets/* assets/"
+    if [ -d "../game" ]; then
+        echo "No assets found in game/assets/ folder."
+        echo "Add assets to game/assets/ if you need them embedded."
+    else
+        echo "Tip: Create game/assets/ in project root for auto-copy."
+        echo "Or manually:"
+        echo "  cd build"
+        echo "  mkdir assets"
+        echo "  cp ../your_game/assets/* assets/"
+    fi
     echo ""
     read -p "Do you want to continue without assets? (y/N): " -n 1 -r
     echo ""
@@ -200,26 +242,41 @@ echo "================================"
 echo "Build Complete!"
 echo "================================"
 
-# Detect executable name based on platform
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    EXE_NAME="ReiLua"
-else
-    EXE_NAME="ReiLua.exe"
+# Read executable name from project.info
+EXE_NAME="ReiLua"
+if [ -f "../project.info" ]; then
+    EXE_NAME=$(grep "^EXECUTABLE_NAME=" ../project.info | cut -d'=' -f2)
 fi
 
-EXESIZE=$(du -h "$EXE_NAME" | cut -f1)
+# Detect executable extension based on platform
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    EXE_FILE="$EXE_NAME"
+else
+    EXE_FILE="${EXE_NAME}.exe"
+fi
+
+if [ ! -f "$EXE_FILE" ]; then
+    echo "Warning: Expected executable not found: $EXE_FILE"
+    echo "Falling back to ReiLua..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        EXE_FILE="ReiLua"
+    else
+        EXE_FILE="ReiLua.exe"
+    fi
+fi
+
+EXESIZE=$(du -h "$EXE_FILE" | cut -f1)
 echo ""
-echo "Executable: $EXE_NAME ($EXESIZE)"
-echo "Location:   $(pwd)/$EXE_NAME"
+echo "Executable: $EXE_FILE ($EXESIZE)"
+echo "Location:   $(pwd)/$EXE_FILE"
 echo ""
 echo "Your game is ready for distribution!"
 echo ""
 echo "To test the release build:"
-echo "  ./$EXE_NAME --log  (with console)"
-echo "  ./$EXE_NAME        (production mode)"
+echo "  ./$EXE_FILE --log  (with console)"
+echo "  ./$EXE_FILE        (production mode)"
 echo ""
 echo "To distribute:"
-echo "  - Copy $EXE_NAME to your distribution folder"
-echo "  - Rename it to your game name (optional)"
+echo "  - Copy $EXE_FILE to your distribution folder"
 echo "  - That's it! Single file distribution!"
 echo ""

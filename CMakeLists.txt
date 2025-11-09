@@ -3,7 +3,20 @@ include( CMakeDependentOption )
 include( EnumOption )
 
 cmake_minimum_required( VERSION 3.9 )
-project( ReiLua )
+
+# Try to read custom project name from project.info
+set( PROJECT_NAME_VAR "ReiLua" )
+if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/project.info" )
+	file( STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/project.info" PROJECT_INFO_LINES )
+	foreach( LINE ${PROJECT_INFO_LINES} )
+		if( LINE MATCHES "^EXECUTABLE_NAME=(.+)$" )
+			set( PROJECT_NAME_VAR "${CMAKE_MATCH_1}" )
+			message( STATUS "Using custom executable name: ${PROJECT_NAME_VAR}" )
+		endif()
+	endforeach()
+endif()
+
+project( ${PROJECT_NAME_VAR} )
 
 # Find Python interpreter (python3 or python)
 find_package(Python3 COMPONENTS Interpreter)
@@ -34,6 +47,12 @@ enum_option( PLATFORM "Desktop;Desktop_SDL2;Desktop_SDL3;Web" "Platform to build
 if( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
 	set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE )
 	set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
+endif()
+
+# Set compiler flags for Release builds
+if( CMAKE_BUILD_TYPE STREQUAL "Release" )
+	add_definitions( -DNDEBUG )
+	message( STATUS "Release build - logging disabled by default" )
 endif()
 
 file( GLOB SOURCES src/*.c )

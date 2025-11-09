@@ -33,12 +33,14 @@ int main( int argn, const char** argc ) {
 	bool interpret_mode = false;
 	bool show_console = false;
 	bool skip_splash = false;
+	bool enable_logging = false;
 
 #ifdef _WIN32
 	/* Check for --log and --no-logo arguments */
 	for ( int i = 1; i < argn; i++ ) {
 		if ( strcmp( argc[i], "--log" ) == 0 ) {
 			show_console = true;
+			enable_logging = true;
 		}
 		if ( strcmp( argc[i], "--no-logo" ) == 0 ) {
 			skip_splash = true;
@@ -59,11 +61,13 @@ int main( int argn, const char** argc ) {
 		FreeConsole();
 	}
 #else
-	/* Check for --no-logo on non-Windows platforms */
+	/* Check for --no-logo and --log on non-Windows platforms */
 	for ( int i = 1; i < argn; i++ ) {
 		if ( strcmp( argc[i], "--no-logo" ) == 0 ) {
 			skip_splash = true;
-			break;
+		}
+		if ( strcmp( argc[i], "--log" ) == 0 ) {
+			enable_logging = true;
 		}
 	}
 #endif
@@ -96,26 +100,44 @@ int main( int argn, const char** argc ) {
 		else {
 			/* Only flags were provided, use default path search */
 			char testPath[ STRING_LEN ] = { '\0' };
-			sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
 			
+			/* Check for game/main.lua in working directory */
+			sprintf( testPath, "%s/game/main.lua", GetWorkingDirectory() );
 			if ( FileExists( testPath ) ) {
-				sprintf( basePath, "%s", GetWorkingDirectory() );
+				sprintf( basePath, "%s/game/", GetWorkingDirectory() );
 			}
+			/* Check for main.lua in working directory */
 			else {
-				sprintf( basePath, "%s", GetApplicationDirectory() );
+				sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
+				if ( FileExists( testPath ) ) {
+					sprintf( basePath, "%s", GetWorkingDirectory() );
+				}
+				/* Check exe directory */
+				else {
+					sprintf( basePath, "%s", GetApplicationDirectory() );
+				}
 			}
 		}
 	}
-	/* If no argument given, check current directory first, then exe directory. */
+	/* If no argument given, check game folder first, then current directory, then exe directory. */
 	else {
 		char testPath[ STRING_LEN ] = { '\0' };
-		sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
 		
+		/* Check for game/main.lua in working directory */
+		sprintf( testPath, "%s/game/main.lua", GetWorkingDirectory() );
 		if ( FileExists( testPath ) ) {
-			sprintf( basePath, "%s", GetWorkingDirectory() );
+			sprintf( basePath, "%s/game/", GetWorkingDirectory() );
 		}
+		/* Check for main.lua in working directory */
 		else {
-			sprintf( basePath, "%s", GetApplicationDirectory() );
+			sprintf( testPath, "%s/main.lua", GetWorkingDirectory() );
+			if ( FileExists( testPath ) ) {
+				sprintf( basePath, "%s", GetWorkingDirectory() );
+			}
+			/* Check exe directory */
+			else {
+				sprintf( basePath, "%s", GetApplicationDirectory() );
+			}
 		}
 	}
 
@@ -135,7 +157,7 @@ int main( int argn, const char** argc ) {
 	}
 	else {
 		printVersion();
-		stateInit( argn, argc, basePath );
+		stateInit( argn, argc, basePath, enable_logging );
 		
 		/* Show splash screens if not skipped */
 		if ( !skip_splash ) {

@@ -1,2 +1,6 @@
 .vscode
 build/
+
+# Projects - ignore all folders inside projects/ except the projects folder itself
+projects/*/
+!projects/README.md

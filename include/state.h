@@ -50,7 +50,7 @@ typedef struct {
 
 extern State* state;
 
-bool stateInit( int argn, const char** argc, const char* basePath );
+bool stateInit( int argn, const char** argc, const char* basePath, bool enable_logging );
 void stateContextInit();
 void stateInitInterpret( int argn, const char** argc );
 void stateFree();

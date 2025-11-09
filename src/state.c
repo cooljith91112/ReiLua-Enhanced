@@ -10,7 +10,7 @@
 
 State* state;
 
-bool stateInit( int argn, const char** argc, const char* basePath ) {
+bool stateInit( int argn, const char** argc, const char* basePath, bool enable_logging ) {
 	state = malloc( sizeof( State ) );
 
 	state->basePath = malloc( STRING_LEN * sizeof( char ) );
@@ -35,6 +35,20 @@ bool stateInit( int argn, const char** argc, const char* basePath ) {
 	state->mouseOffset = (Vector2){ 0, 0 };
 	state->mouseScale = (Vector2){ 1, 1 };
 	state->customFontLoaded = false;
+
+	/* Set log level based on build type and --log flag */
+#ifdef NDEBUG
+	/* Release build - only show warnings/errors unless --log is specified */
+	if ( enable_logging ) {
+		SetTraceLogLevel( LOG_INFO );
+	}
+	else {
+		SetTraceLogLevel( LOG_WARNING );
+	}
+#else
+	/* Debug/Dev build - always show all logs */
+	SetTraceLogLevel( LOG_INFO );
+#endif
 
 	InitWindow( state->resolution.x, state->resolution.y, "ReiLua" );
 
