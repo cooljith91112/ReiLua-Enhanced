@@ -18,60 +18,25 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Clean old embedded files (important for dev builds!)
-echo Cleaning old embedded files...
-del /Q embedded_main.h embedded_assets.h 2>nul
+REM ALWAYS clean build folder for fresh build
+echo Cleaning build directory for fresh build...
+del /Q /S * >nul 2>&1
+for /d %%p in (*) do rmdir "%%p" /s /q >nul 2>&1
+echo * Build directory cleaned
+echo.
 
-REM Warn about Lua files in build directory
-dir /b *.lua >nul 2>&1
-if not errorlevel 1 (
-    echo.
-    echo WARNING: Found Lua files in build directory!
-    echo Development builds should load from file system, not embed.
-    echo.
-    dir /b *.lua
-    echo.
-    set /p REMOVE="Remove these files from build directory? (Y/n): "
-    if /i not "%REMOVE%"=="n" (
-        del /Q *.lua
-        echo Lua files removed.
-    )
-    echo.
-)
-
-REM Warn about assets folder in build directory
-if exist "assets" (
-    echo.
-    echo WARNING: Found assets folder in build directory!
-    echo Development builds should load from file system, not embed.
-    echo.
-    set /p REMOVE="Remove assets folder from build directory? (Y/n): "
-    if /i not "%REMOVE%"=="n" (
-        rmdir /S /Q assets
-        echo Assets folder removed.
-    )
-    echo.
-)
-
-REM Clean old configuration if requested
-if "%1"=="clean" (
-    echo Cleaning build directory...
-    del /Q CMakeCache.txt *.o *.a 2>nul
-    rmdir /S /Q CMakeFiles 2>nul
-    echo Clean complete!
-    echo.
-)
-
-REM Configure with MinGW
+REM Configure
 echo Configuring CMake for development...
 cmake -G "MinGW Makefiles" ..
 
 if errorlevel 1 (
     echo.
     echo ERROR: CMake configuration failed!
+    pause
     exit /b 1
 )
 
+REM Build
 echo.
 echo Building ReiLua...
 mingw32-make
@@ -79,6 +44,7 @@ mingw32-make
 if errorlevel 1 (
     echo.
     echo ERROR: Build failed!
+    pause
     exit /b 1
 )
 

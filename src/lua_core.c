@@ -124,23 +124,39 @@ static int embedded_lua_loader( lua_State* L ) {
 	const char* name = lua_tostring( L, 1 );
 	if ( name == NULL ) return 0;
 	
-	for ( int i = 0; i < embedded_lua_file_count; i++ ) {
-		const EmbeddedLuaFile* file = &embedded_lua_files[i];
+	/* Convert module name dots to slashes (e.g., "lib.gamestate" -> "lib/gamestate") */
+	char converted_name[512];
+	strncpy( converted_name, name, sizeof(converted_name) - 1 );
+	converted_name[sizeof(converted_name) - 1] = '\0';
+	for ( char* p = converted_name; *p; p++ ) {
+		if ( *p == '.' ) *p = '/';
+	}
+	
+	/* Try both converted name and original name */
+	const char* names_to_try[] = { converted_name, name };
+	
+	for ( int n = 0; n < 2; n++ ) {
+		const char* try_name = names_to_try[n];
 		
-		const char* basename = file->name;
-		size_t name_len = strlen( name );
-		size_t base_len = strlen( basename );
-		
-		if ( strcmp( basename, name ) == 0 || 
-		     ( base_len > 4 && strcmp( basename + base_len - 4, ".lua" ) == 0 && 
-		       strncmp( basename, name, base_len - 4 ) == 0 && name_len == base_len - 4 ) ) {
+		for ( int i = 0; i < embedded_lua_file_count; i++ ) {
+			const EmbeddedLuaFile* file = &embedded_lua_files[i];
 			
-			if ( luaL_loadbuffer( L, (const char*)file->data, file->size, file->name ) == 0 ) {
-				return 1;
-			}
-			else {
-				lua_pushfstring( L, "\n\tembedded loader error: %s", lua_tostring( L, -1 ) );
-				return 1;
+			const char* basename = file->name;
+			size_t name_len = strlen( try_name );
+			size_t base_len = strlen( basename );
+			
+			/* Match exactly, or match without .lua extension */
+			if ( strcmp( basename, try_name ) == 0 || 
+			     ( base_len > 4 && strcmp( basename + base_len - 4, ".lua" ) == 0 && 
+			       strncmp( basename, try_name, base_len - 4 ) == 0 && name_len == base_len - 4 ) ) {
+				
+				if ( luaL_loadbuffer( L, (const char*)file->data, file->size, file->name ) == 0 ) {
+					return 1;
+				}
+				else {
+					lua_pushfstring( L, "\n\tembedded loader error: %s", lua_tostring( L, -1 ) );
+					return 1;
+				}
 			}
 		}
 	}
@@ -1530,6 +1546,25 @@ bool luaInit( int argn, const char** argc ) {
 		TraceLog( LOG_WARNING, "%s", "Failed to init Lua" );
 		return false;
 	}
+
+	/* Configure package.path to include basePath and all subdirectories */
+	if ( state->basePath != NULL && strlen( state->basePath ) > 0 ) {
+		lua_getglobal( L, "package" );
+		lua_getfield( L, -1, "path" );
+		const char* currentPath = lua_tostring( L, -1 );
+		lua_pop( L, 1 );
+		
+		/* Add basePath and recursive subdirectory patterns for flexible module loading */
+		char newPath[STRING_LEN * 4];
+		snprintf( newPath, sizeof(newPath), 
+			"%s?.lua;%s?/init.lua;%s?/?.lua;%s?/?/init.lua;%s",
+			state->basePath, state->basePath, state->basePath, state->basePath, currentPath );
+		
+		lua_pushstring( L, newPath );
+		lua_setfield( L, -2, "path" );
+		lua_pop( L, 1 );
+	}
+
 	/* Define object types. */
 	defineBuffer();
 	defineImage();

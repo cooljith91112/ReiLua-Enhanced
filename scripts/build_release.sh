@@ -68,38 +68,50 @@ fi
 mkdir -p build
 cd build || exit 1
 
+# ALWAYS clean build folder for fresh build
+echo "Cleaning build directory for fresh build..."
+rm -rf ./* 2>/dev/null
+echo "✓ Build directory cleaned"
+echo ""
+
 # Clean old embedded files
-echo "Cleaning old embedded files..."
-rm -f embedded_main.h embedded_assets.h
+echo "Ready for fresh build..."
+rm -f embedded_main.h embedded_assets.h 2>/dev/null
 
 # Auto-copy from game folder if it exists
 echo ""
 if [ -d "../game" ]; then
-    echo "Found game/ folder - auto-copying contents to build..."
+    echo "Found game/ folder - auto-copying ALL contents to build..."
     
-    # Copy all Lua files from game folder EXCEPT ReiLua_API.lua
-    if ls ../game/*.lua 1> /dev/null 2>&1; then
-        for lua_file in ../game/*.lua; do
-            filename=$(basename "$lua_file")
-            if [ "$filename" != "ReiLua_API.lua" ]; then
-                cp "$lua_file" .
-            fi
-        done
-        LUA_COUNT=$(ls *.lua 2>/dev/null | wc -l)
-        echo "  ✓ Copied $LUA_COUNT Lua file(s)"
+    # Copy everything from game folder recursively, excluding:
+    # - ReiLua_API.lua (LSP only)
+    # - .luarc.json (LSP config)
+    # - .DS_Store (macOS)
+    # - Hidden files starting with . (except .gitkeep if present)
+    
+    # Use rsync if available for better copying, otherwise use cp
+    if command -v rsync &> /dev/null; then
+        rsync -av --exclude='ReiLua_API.lua' --exclude='.luarc.json' --exclude='.DS_Store' --exclude='.*' --include='.gitkeep' ../game/ . 2>/dev/null
     else
-        echo "  ⚠ No Lua files found in game/"
+        # Fallback to find + cp - Copy ALL files and directories
+        (cd ../game && find . -type f \
+            ! -name 'ReiLua_API.lua' \
+            ! -name '.luarc.json' \
+            ! -name '.DS_Store' \
+            ! -path '*/\.*' -o -name '.gitkeep' \
+            -exec sh -c 'mkdir -p "../build/$(dirname "{}")" && cp -p "{}" "../build/{}"' \; 2>/dev/null)
     fi
     
-    # Copy assets folder if it exists
-    if [ -d "../game/assets" ]; then
-        rm -rf assets
-        cp -r ../game/assets .
-        ASSET_COUNT=$(find assets -type f 2>/dev/null | wc -l)
-        echo "  ✓ Copied assets/ ($ASSET_COUNT files)"
-    else
-        echo "  ℹ No assets folder in game/"
-    fi
+    # Count what was copied
+    LUA_COUNT=$(find . -maxdepth 10 -name "*.lua" -type f 2>/dev/null | wc -l)
+    ASSET_COUNT=$(find assets -type f 2>/dev/null | wc -l || echo "0")
+    TOTAL_FILES=$(find . -type f ! -path './CMakeFiles/*' ! -path './.cmake/*' ! -name 'CMake*' ! -name '*.a' ! -name '*.o' 2>/dev/null | wc -l)
+    
+    echo "  ✓ Copied ALL game files and folders:"
+    echo "    - $LUA_COUNT Lua file(s) (including all subdirectories)"
+    echo "    - $ASSET_COUNT Asset file(s) (if assets folder exists)"
+    echo "    - $TOTAL_FILES total file(s)"
+    echo "    - All folder structures preserved (user-created folders included)"
     echo ""
 fi
 
@@ -131,34 +143,18 @@ else
     ls -1 *.lua
 fi
 
-# Check for assets folder
+# Check for non-Lua data files (any folder, any file type)
 echo ""
-echo "Checking for assets..."
-if [ ! -d "assets" ]; then
-    echo ""
-    echo "WARNING: No assets folder found!"
-    echo ""
-    if [ -d "../game" ]; then
-        echo "No assets found in game/assets/ folder."
-        echo "Add assets to game/assets/ if you need them embedded."
-    else
-        echo "Tip: Create game/assets/ in project root for auto-copy."
-        echo "Or manually:"
-        echo "  cd build"
-        echo "  mkdir assets"
-        echo "  cp ../your_game/assets/* assets/"
-    fi
-    echo ""
-    read -p "Do you want to continue without assets? (y/N): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-    EMBED_ASSETS="OFF"
-else
-    ASSET_FILES=$(find assets -type f 2>/dev/null | wc -l)
-    echo "Found $ASSET_FILES asset file(s) in assets folder"
+echo "Checking for data files to embed..."
+NON_LUA_FILES=$(find . -type f ! -name "*.lua" ! -path "./CMakeFiles/*" ! -path "./.cmake/*" ! -name "CMake*" ! -name "Makefile*" ! -name "*.o" ! -name "*.a" 2>/dev/null | wc -l)
+
+if [ "$NON_LUA_FILES" -gt 0 ]; then
+    echo "Found $NON_LUA_FILES non-Lua file(s) to embed"
+    echo "  (includes: images, sounds, config, data, and any other files)"
     EMBED_ASSETS="ON"
+else
+    echo "No non-Lua files found (only Lua code will be embedded)"
+    EMBED_ASSETS="OFF"
 fi
 
 echo ""
@@ -166,7 +162,7 @@ echo "================================"
 echo "Build Configuration"
 echo "================================"
 echo "Lua Embedding:    ON"
-echo "Asset Embedding:  $EMBED_ASSETS"
+echo "Data Embedding:   $EMBED_ASSETS"
 echo "Build Type:       Release"
 echo "================================"
 echo ""

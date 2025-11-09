@@ -40,17 +40,18 @@ def embed_files(output_file, input_files):
                 data = inf.read()
             
             var_name = sanitize_name(input_file)
-            # Extract relative path from 'assets/' onwards if present
-            if 'assets' in input_file.replace('\\', '/'):
-                parts = input_file.replace('\\', '/').split('assets/')
-                if len(parts) > 1:
-                    relative_name = 'assets/' + parts[-1]
-                else:
-                    relative_name = os.path.basename(input_file)
-            else:
-                relative_name = os.path.basename(input_file)
+            # Extract relative path from build directory
+            relative_name = input_file
+            for prefix in ['build/', 'build\\']:
+                if prefix in input_file:
+                    parts = input_file.split(prefix, 1)
+                    if len(parts) > 1:
+                        relative_name = parts[1]
+                        break
+            # Normalize path separators
+            relative_name = relative_name.replace('\\', '/')
             
-            f.write(f'/* Embedded asset: {input_file} ({len(data)} bytes) */\n')
+            f.write(f'/* Embedded file: {relative_name} ({len(data)} bytes) */\n')
             f.write(f'static const unsigned char embedded_asset_{idx}_{var_name}[] = {{\n')
             
             for i, byte in enumerate(data):
@@ -78,15 +79,16 @@ def embed_files(output_file, input_files):
         f.write('static const EmbeddedAsset embedded_assets[] = {\n')
         for idx, input_file in enumerate(input_files):
             var_name = sanitize_name(input_file)
-            # Extract relative path from 'assets/' onwards if present
-            if 'assets' in input_file.replace('\\', '/'):
-                parts = input_file.replace('\\', '/').split('assets/')
-                if len(parts) > 1:
-                    relative_name = 'assets/' + parts[-1]
-                else:
-                    relative_name = os.path.basename(input_file)
-            else:
-                relative_name = os.path.basename(input_file)
+            # Extract relative path from build directory
+            relative_name = input_file
+            for prefix in ['build/', 'build\\']:
+                if prefix in input_file:
+                    parts = input_file.split(prefix, 1)
+                    if len(parts) > 1:
+                        relative_name = parts[1]
+                        break
+            # Normalize path separators
+            relative_name = relative_name.replace('\\', '/')
             f.write(f'    {{ "{relative_name}", embedded_asset_{idx}_{var_name}, embedded_asset_{idx}_{var_name}_len }},\n')
         f.write('};\n\n')
         

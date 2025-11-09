@@ -97,15 +97,15 @@ if( WIN32 )
 	list( APPEND SOURCES ${CMAKE_SOURCE_DIR}/resources.rc )
 endif()
 
-# Embed Lua files if EMBED_MAIN is ON
+# Embed Lua files if EMBED_MAIN is ON (recursively from all subdirectories)
 if( EMBED_MAIN )
-	file( GLOB LUA_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.lua" )
+	file( GLOB_RECURSE LUA_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.lua" )
 	if( LUA_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h
 			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
 			DEPENDS ${LUA_FILES}
-			COMMENT "Embedding Lua files into executable..."
+			COMMENT "Embedding Lua files from all subdirectories into executable..."
 		)
 		list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h )
 		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_MAIN" )
@@ -114,21 +114,60 @@ if( EMBED_MAIN )
 	endif()
 endif()
 
-# Embed asset files if EMBED_ASSETS is ON
+# Embed all non-Lua data files if EMBED_ASSETS is ON (from all subdirectories except CMake dirs)
+# Always create embedded_assets.h to prevent compilation errors
 if( EMBED_ASSETS )
-	file( GLOB_RECURSE ASSET_FILES "${CMAKE_CURRENT_BINARY_DIR}/assets/*" )
+	# Find all non-Lua files recursively, excluding build system files
+	file( GLOB_RECURSE ALL_DATA_FILES 
+		"${CMAKE_CURRENT_BINARY_DIR}/*"
+	)
+	# Filter out unwanted files
+	set( ASSET_FILES "" )
+	foreach( FILE_PATH ${ALL_DATA_FILES} )
+		# Exclude: .lua files (handled separately), build artifacts, and CMake files
+		if( NOT FILE_PATH MATCHES "\\.lua$" 
+			AND NOT FILE_PATH MATCHES "CMakeFiles" 
+			AND NOT FILE_PATH MATCHES "\\.cmake$"
+			AND NOT FILE_PATH MATCHES "CMakeCache"
+			AND NOT FILE_PATH MATCHES "Makefile$"
+			AND NOT FILE_PATH MATCHES "\\.a$"
+			AND NOT FILE_PATH MATCHES "\\.o$"
+			AND NOT FILE_PATH MATCHES "embedded_.*\\.h$"
+			AND NOT FILE_PATH MATCHES "\\.exe$"
+			AND NOT FILE_PATH MATCHES "ReiLua$" )
+			list( APPEND ASSET_FILES ${FILE_PATH} )
+		endif()
+	endforeach()
+	
 	if( ASSET_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
 			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
 			DEPENDS ${ASSET_FILES}
-			COMMENT "Embedding asset files into executable..."
+			COMMENT "Embedding data files from all subdirectories into executable..."
 		)
-		list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h )
 		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_ASSETS" )
+		message( STATUS "Embedding ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h with asset files" )
 	else()
-		message( WARNING "EMBED_ASSETS is ON but no files found in build/assets/ directory!" )
+		# Create empty embedded_assets.h to prevent compilation errors
+		message( STATUS "EMBED_ASSETS is ON but no data files found, creating empty embedded_assets.h" )
+		add_custom_command(
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
+			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/create_empty_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
+			COMMENT "Creating empty embedded_assets.h (no data files to embed)"
+		)
+		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEMBED_ASSETS" )
 	endif()
+	list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h )
+else()
+	# EMBED_ASSETS is OFF - create empty header for compatibility
+	message( STATUS "EMBED_ASSETS is OFF, creating empty embedded_assets.h" )
+	add_custom_command(
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/create_empty_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
+		COMMENT "Creating empty embedded_assets.h (EMBED_ASSETS is OFF)"
+	)
+	list( APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h )
 endif()
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
