@@ -287,8 +287,8 @@ VERSION="__VERSION__"
 AUTHOR_NAME="__AUTHOR_NAME__"
 DESCRIPTION="__DESCRIPTION__"
 
-if [ ! -f "build/ReiLua" ]; then
-    echo "ERROR: ReiLua executable not found! Build first."
+if [ ! -f "build/$EXECUTABLE_NAME" ]; then
+    echo "ERROR: Game executable not found! Build first."
     exit 1
 fi
 
@@ -299,7 +299,7 @@ echo "Creating $APP_BUNDLE..."
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
-cp build/ReiLua "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+cp build/$EXECUTABLE_NAME "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 chmod +x "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 
 # Convert icon
@@ -558,7 +558,7 @@ cat > "$PROJECT_DIR/game/main.lua" << EOFLUA
 function RL.init()
     RL.SetWindowTitle( "$PROJECT_NAME" )
     RL.SetWindowState( RL.FLAG_VSYNC_HINT )
-    
+
     print("$PROJECT_NAME initialized!")
     print("Version: $VERSION")
     print("Author: $AUTHOR_NAME")
@@ -567,7 +567,7 @@ end
 function RL.update( delta )
     -- Game logic goes here
     -- delta is time since last frame in seconds
-    
+
     if RL.IsKeyPressed( RL.KEY_ESCAPE ) then
         RL.CloseWindow()
     end
@@ -575,7 +575,7 @@ end
 
 function RL.draw()
     RL.ClearBackground( RL.RAYWHITE )
-    
+
     RL.DrawText( "$PROJECT_NAME", { 10, 10 }, 40, RL.BLACK )
     RL.DrawText( "Press ESC to exit", { 10, 60 }, 20, RL.DARKGRAY )
 end
