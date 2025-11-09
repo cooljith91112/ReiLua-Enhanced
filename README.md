@@ -7,12 +7,14 @@
 ## About This Version
 
 This is an enhanced version of ReiLua featuring:
-- **Embedded Lua Support** - Bundle all your Lua code into a single executable
-- **Embedded Assets** - Package images, sounds, and other assets into your game
-- **Splash Screens** - Customizable startup screens featuring Raylib and ReiLua
-- **Asset Loading System** - Loading screen with progress tracking
-- **Automated Build Scripts** - One-command development and release builds
-- **Console Control** - Debug logging system for development
+- Embedded Lua Support - Bundle all your Lua code into a single executable
+- Embedded Assets - Package images, sounds, and other assets into your game
+- Splash Screens - Customizable startup screens featuring Raylib and ReiLua
+- Asset Loading System - Loading screen with progress tracking
+- Automated Build Scripts - One-command development and release builds
+- Console Control - Debug logging system for development
+- macOS Support - Build for macOS with static linking (see [MACOS.md](MACOS.md))
+- Project Creation Tool - Automated project setup with metadata embedding
 
 ## What is ReiLua?
 

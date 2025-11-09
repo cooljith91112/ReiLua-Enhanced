@@ -4,6 +4,9 @@
 #include "lua_core.h"
 #include "textures.h"
 
+// Note: STB rect pack is already included in raylib, so we just declare the types
+#include "external/stb_rect_pack.h"
+
 /*
 ## Shapes - Basic shapes drawing functions
 */

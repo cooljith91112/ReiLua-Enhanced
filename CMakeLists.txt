@@ -5,6 +5,17 @@ include( EnumOption )
 cmake_minimum_required( VERSION 3.9 )
 project( ReiLua )
 
+# Find Python interpreter (python3 or python)
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
+	set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+else()
+	find_program(PYTHON_EXECUTABLE NAMES python3 python)
+	if(NOT PYTHON_EXECUTABLE)
+		message(FATAL_ERROR "Python not found. Please install Python 3.")
+	endif()
+endif()
+
 # To make web build
 # cmake .. -DCMAKE_TOOLCHAIN_FILE=<YOUR PATH HERE>/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DPLATFORM=Web
 
@@ -35,7 +46,7 @@ set( LOGO_FILES
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h
-	COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_logo.py 
+	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_logo.py 
 		${CMAKE_CURRENT_BINARY_DIR}/embedded_logo.h 
 		${CMAKE_SOURCE_DIR}/logo/raylib_logo.png 
 		${CMAKE_SOURCE_DIR}/logo/reilua_logo.png
@@ -50,7 +61,7 @@ set( FONT_FILE "${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf" )
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h
-	COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_font.py 
+	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_font.py 
 		${CMAKE_CURRENT_BINARY_DIR}/embedded_font.h 
 		${CMAKE_SOURCE_DIR}/fonts/Oleaguid.ttf
 	DEPENDS ${FONT_FILE}
@@ -73,7 +84,7 @@ if( EMBED_MAIN )
 	if( LUA_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h
-			COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
+			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_lua.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_main.h ${LUA_FILES}
 			DEPENDS ${LUA_FILES}
 			COMMENT "Embedding Lua files into executable..."
 		)
@@ -90,7 +101,7 @@ if( EMBED_ASSETS )
 	if( ASSET_FILES )
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h
-			COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
+			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/embed_assets.py ${CMAKE_CURRENT_BINARY_DIR}/embedded_assets.h ${ASSET_FILES}
 			DEPENDS ${ASSET_FILES}
 			COMMENT "Embedding asset files into executable..."
 		)
@@ -132,7 +143,54 @@ if( PLATFORM STREQUAL "Web" )
 	set( resources_dir "resources@/" ) # Sets resources as root for the virtual file system.
 	set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS "--preload-file ${resources_dir}" )
 else() # Desktop
-	if( SHARED )
+	if( APPLE )
+		# macOS: Try static libraries first, fall back to Homebrew if not available
+		if( EXISTS "${CMAKE_SOURCE_DIR}/lib/macos/libraylib.a" AND EXISTS "${CMAKE_SOURCE_DIR}/lib/macos/liblua.a" )
+			# Static libraries available - use them for single-file distribution
+			message( "macOS - Using static libraries (single-file distribution)" )
+			set( CMAKE_C_COMPILER "clang" )
+			set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc" )
+			
+			target_link_libraries( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/macos/libraylib.a )
+			target_link_libraries( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/macos/liblua.a )
+			
+			# macOS frameworks required for raylib
+			target_link_libraries( ${PROJECT_NAME} "-framework IOKit" )
+			target_link_libraries( ${PROJECT_NAME} "-framework Cocoa" )
+			target_link_libraries( ${PROJECT_NAME} "-framework OpenGL" )
+			target_link_libraries( ${PROJECT_NAME} "-framework CoreFoundation" )
+		else()
+			# Use Homebrew shared libraries (for development)
+			message( "macOS - Using Homebrew shared libraries (development mode)" )
+			message( "    To build for distribution, run: ./scripts/macos/build_static_libs.sh" )
+			
+			set( CMAKE_C_COMPILER "clang" )
+			set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSHARED -fobjc-arc" )
+			
+			# Find and link Raylib
+			find_package(PkgConfig REQUIRED)
+			pkg_check_modules(RAYLIB REQUIRED raylib)
+			include_directories(${RAYLIB_INCLUDE_DIRS})
+			target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIBRARIES})
+			
+			# Find and link Lua
+			pkg_check_modules(LUA REQUIRED lua)
+			include_directories(${LUA_INCLUDE_DIRS})
+			target_link_libraries(${PROJECT_NAME} ${LUA_LIBRARIES})
+			
+			# Find and link GLFW
+			pkg_check_modules(GLFW REQUIRED glfw3)
+			include_directories(${GLFW_INCLUDE_DIRS})
+			target_link_libraries(${PROJECT_NAME} ${GLFW_LIBRARIES})
+
+			# macOS frameworks
+			target_link_libraries( ${PROJECT_NAME} "-framework IOKit" )
+			target_link_libraries( ${PROJECT_NAME} "-framework Cocoa" )
+			target_link_libraries( ${PROJECT_NAME} "-framework OpenGL" )
+			target_link_libraries( ${PROJECT_NAME} "-framework CoreFoundation" )
+		endif()
+	elseif( SHARED )
+		# Linux/Windows with shared libraries
 		message( Shared )
 		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSHARED" )
 		# find_package( raylib 5.0 REQUIRED ) # Requires at least version 5.0
@@ -145,6 +203,7 @@ else() # Desktop
 			target_link_libraries( ${PROJECT_NAME} lua )
 		endif()
 	else()
+		# Static linking (Windows/Linux)
 		message( Static )
 		target_link_libraries( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/libraylib.a )
 
@@ -156,7 +215,7 @@ else() # Desktop
 		endif()
 	endif()
 
-	if( UNIX )
+	if( UNIX AND NOT APPLE )
 		set( CMAKE_C_COMPILER "gcc" )
 
 		if( EXPOSE_API_SYMBOLS )
@@ -181,16 +240,10 @@ else() # Desktop
 			target_link_libraries( ${PROJECT_NAME} raylib GLESv2 EGL pthread rt m gbm drm dl atomic )
 		else()
 			# target_link_libraries( ${PROJECT_NAME} m dl pthread )
-			target_link_libraries( ${PROJECT_NAME} m dl pthread glfw )
+			if( NOT APPLE )
+				target_link_libraries( ${PROJECT_NAME} m dl pthread glfw )
+			endif()
 		endif()
-	elseif( APPLE )
-		set( CMAKE_C_COMPILER "clang" )
-
-		# //TODO Linking to SDL.
-
-		target_link_libraries( ${PROJECT_NAME} "-framework IOKit" )
-		target_link_libraries( ${PROJECT_NAME} "-framework Cocoa" )
-		target_link_libraries( ${PROJECT_NAME} "-framework OpenGL" )
 	elseif( WIN32 )
 		if( EXPOSE_API_SYMBOLS )
 			set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DEXPOSE_LUA_API_SYMBOLS" )

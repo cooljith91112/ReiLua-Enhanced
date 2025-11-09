@@ -1,6 +1,6 @@
 #!/bin/bash
 # ReiLua Release Build Script
-# Run this from w64devkit shell
+# Works on Windows (w64devkit) and macOS
 
 echo "================================"
 echo "ReiLua - Release Build"
@@ -15,6 +15,53 @@ cd "$SCRIPT_DIR/.." || exit 1
 if [ ! -f "CMakeLists.txt" ]; then
     echo "ERROR: Cannot find CMakeLists.txt in project root"
     exit 1
+fi
+
+# Check for dependencies on macOS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "Checking macOS build configuration..."
+    
+    # Check if static libraries exist
+    if [ -f "../lib/macos/libraylib.a" ] && [ -f "../lib/macos/liblua.a" ]; then
+        echo "✓ Static libraries found - building for distribution"
+        echo "  (Single-file executable, no dependencies)"
+        echo ""
+    else
+        echo "⚠️  Static libraries not found - using Homebrew libraries"
+        echo ""
+        echo "This build will require raylib/lua at runtime."
+        echo ""
+        echo "For distribution builds (single executable), run:"
+        echo "  ./scripts/macos/build_static_libs.sh"
+        echo ""
+        
+        # Check for Homebrew dependencies
+        MISSING_DEPS=()
+        
+        if ! brew list glfw &>/dev/null; then
+            MISSING_DEPS+=("glfw")
+        fi
+        
+        if ! brew list raylib &>/dev/null; then
+            MISSING_DEPS+=("raylib")
+        fi
+        
+        if ! brew list lua &>/dev/null; then
+            MISSING_DEPS+=("lua")
+        fi
+        
+        if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+            echo "ERROR: Missing Homebrew packages: ${MISSING_DEPS[*]}"
+            echo ""
+            echo "Install with:"
+            echo "  brew install ${MISSING_DEPS[*]} pkg-config"
+            echo ""
+            exit 1
+        fi
+        
+        echo "✓ Homebrew dependencies found"
+        echo ""
+    fi
 fi
 
 # Create and navigate to build directory
@@ -88,10 +135,25 @@ echo ""
 echo "Cleaning CMake cache..."
 rm -rf CMakeCache.txt CMakeFiles/
 
+# Detect platform and set appropriate generator
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    CMAKE_GENERATOR="Unix Makefiles"
+    BUILD_CMD="make"
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "mingw"* ]]; then
+    # Windows with MinGW
+    CMAKE_GENERATOR="MinGW Makefiles"
+    BUILD_CMD="make"
+else
+    # Linux and others
+    CMAKE_GENERATOR="Unix Makefiles"
+    BUILD_CMD="make"
+fi
+
 # Configure with embedding enabled
 echo ""
-echo "Configuring CMake for release..."
-cmake -G "MinGW Makefiles" .. -DEMBED_MAIN=ON -DEMBED_ASSETS=$EMBED_ASSETS -DCMAKE_BUILD_TYPE=Release
+echo "Configuring CMake for release (${OSTYPE})..."
+cmake -G "$CMAKE_GENERATOR" .. -DEMBED_MAIN=ON -DEMBED_ASSETS=$EMBED_ASSETS -DCMAKE_BUILD_TYPE=Release
 
 if [ $? -ne 0 ]; then
     echo ""
@@ -102,7 +164,7 @@ fi
 # Build
 echo ""
 echo "Building ReiLua Release..."
-make
+$BUILD_CMD
 
 if [ $? -ne 0 ]; then
     echo ""
@@ -137,19 +199,27 @@ echo ""
 echo "================================"
 echo "Build Complete!"
 echo "================================"
-EXESIZE=$(du -h ReiLua.exe | cut -f1)
+
+# Detect executable name based on platform
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    EXE_NAME="ReiLua"
+else
+    EXE_NAME="ReiLua.exe"
+fi
+
+EXESIZE=$(du -h "$EXE_NAME" | cut -f1)
 echo ""
-echo "Executable: ReiLua.exe ($EXESIZE)"
-echo "Location:   $(pwd)/ReiLua.exe"
+echo "Executable: $EXE_NAME ($EXESIZE)"
+echo "Location:   $(pwd)/$EXE_NAME"
 echo ""
 echo "Your game is ready for distribution!"
 echo ""
 echo "To test the release build:"
-echo "  ./ReiLua.exe --log  (with console)"
-echo "  ./ReiLua.exe        (production mode)"
+echo "  ./$EXE_NAME --log  (with console)"
+echo "  ./$EXE_NAME        (production mode)"
 echo ""
 echo "To distribute:"
-echo "  - Copy ReiLua.exe to your distribution folder"
+echo "  - Copy $EXE_NAME to your distribution folder"
 echo "  - Rename it to your game name (optional)"
 echo "  - That's it! Single file distribution!"
 echo ""
